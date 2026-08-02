@@ -1,12 +1,8 @@
 'use client';
 import {Languages,Leaf,Search} from 'lucide-react';
 import {StudyLanguage} from '@/types';
-
-export function LanguageSelector({value,onChange}:{value:StudyLanguage;onChange:(v:StudyLanguage)=>void}){
-  return <div className="inline-flex p-1 rounded-2xl gap-1" role="group" aria-label="Язык обучения" style={{background:'var(--paper-2)',border:'1px solid var(--line)'}}>
-    {(['english','german'] as const).map(l=><button key={l} aria-pressed={value===l} onClick={()=>onChange(l)} className="min-h-11 px-3 md:px-4 rounded-xl font-bold text-sm flex items-center gap-2" style={{background:value===l?'var(--card-strong)':'var(--paper-2)',color:value===l?'var(--green)':'var(--muted)',border:value===l?'1px solid var(--line)':'1px solid var(--paper-2)'}}><Languages size={17}/>{l==='english'?'Английский':'Немецкий'}</button>)}
-  </div>
-}
+import {useI18n} from '@/lib/i18n';
+export function LanguageSelector({value,onChange}:{value:StudyLanguage;onChange:(v:StudyLanguage)=>void}){const {t}=useI18n();return <div className="inline-flex p-1 rounded-2xl gap-1" role="group" aria-label={t('studyLanguage')} style={{background:'var(--paper-2)',border:'1px solid var(--line)'}}>{(['english','german'] as const).map(l=><button key={l} aria-pressed={value===l} onClick={()=>onChange(l)} className="min-h-11 px-3 md:px-4 rounded-xl font-bold text-sm flex items-center gap-2" style={{background:value===l?'var(--card-strong)':'var(--paper-2)',color:value===l?'var(--green)':'var(--muted)',border:value===l?'1px solid var(--line)':'1px solid var(--paper-2)'}}><Languages size={17}/>{t(l)}</button>)}</div>}
 export function Progress({value}:{value:number}){return <div className="progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(value)}><i style={{width:`${Math.max(0,Math.min(100,value))}%`}}/></div>}
-export function SearchBox({value,onChange}:{value:string;onChange:(s:string)=>void}){return <label className="relative block"><span className="sr-only">Поиск слов</span><Search size={18} className="absolute left-4 top-4 muted"/><input className="pl-11" value={value} onChange={e=>onChange(e.target.value)} placeholder="Найти слово или перевод…" type="search"/></label>}
+export function SearchBox({value,onChange}:{value:string;onChange:(s:string)=>void}){const {t}=useI18n();return <label className="relative block"><span className="sr-only">{t('searchWords')}</span><Search size={18} className="absolute left-4 top-4 muted"/><input className="pl-11" value={value} onChange={e=>onChange(e.target.value)} placeholder={t('searchPlaceholder')} type="search"/></label>}
 export function Empty({title,text}:{title:string;text:string}){return <div className="card p-10 text-center"><span className="secondary inline-flex p-4 rounded-2xl mb-4"><Leaf size={28}/></span><h3 className="font-bold text-lg">{title}</h3><p className="muted mt-2">{text}</p></div>}
