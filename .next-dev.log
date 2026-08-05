@@ -381,13 +381,3 @@
  GET / 200 in 99ms (next.js: 11ms, application-code: 88ms)
  GET /youtube 200 in 55ms (next.js: 9ms, application-code: 46ms)
  POST /api/youtube-vocabulary 200 in 16.1s (next.js: 922ms, application-code: 15.2s)
-○ Compiling /_not-found/page ...
- GET / 200 in 730ms (next.js: 157ms, application-code: 574ms)
- GET / 200 in 16.5s (next.js: 13.9s, application-code: 2.5s)
- GET / 200 in 991ms (next.js: 736ms, application-code: 255ms)
- GET / 200 in 110ms (next.js: 16ms, application-code: 94ms)
- GET / 200 in 347ms (next.js: 23ms, application-code: 324ms)
- GET /youtube 404 in 2.7s (next.js: 2.6s, application-code: 141ms)
- GET /youtube 404 in 19.3s (next.js: 19.0s, application-code: 314ms)
- GET /youtube 404 in 217ms (next.js: 19ms, application-code: 198ms)
- GET /youtube 404 in 311ms (next.js: 18ms, application-code: 292ms)
