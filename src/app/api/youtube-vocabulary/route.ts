@@ -76,21 +76,32 @@ function readTimedTextTracks(source:string){
 }
 
 const INNERTUBE_API_KEY='AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
-const ANDROID_VR_CLIENT={clientName:'ANDROID_VR',clientVersion:'1.65.10',deviceMake:'Oculus',deviceModel:'Quest 3',androidSdkVersion:32,hl:'en',gl:'US',userAgent:'com.google.android.apps.youtube.vr.oculus/1.65.10 (Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip'};
+const INNERTUBE_CLIENTS=[
+  {clientName:'ANDROID',clientVersion:'21.03.36',androidSdkVersion:36,hl:'en',gl:'US',userAgent:'com.google.android.youtube/21.03.36(Linux; U; Android 16; en_US; SM-S908E Build/TP1A.220624.014) gzip'},
+  {clientName:'ANDROID_VR',clientVersion:'1.65.10',deviceMake:'Oculus',deviceModel:'Quest 3',androidSdkVersion:32,hl:'en',gl:'US',userAgent:'com.google.android.apps.youtube.vr.oculus/1.65.10 (Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip'},
+  {clientName:'IOS',clientVersion:'20.11.6',deviceModel:'iPhone10,4',osName:'iOS',osVersion:'16.7.7.20H330',hl:'en',gl:'US',userAgent:'com.google.ios.youtube/20.11.6 (iPhone10,4; U; CPU iOS 16_7_7 like Mac OS X)'},
+];
+
+async function requestPlayer(videoId:string,client:typeof INNERTUBE_CLIENTS[number]){
+  const response=await fetchWithTimeout(`https://www.youtube.com/youtubei/v1/player?key=${INNERTUBE_API_KEY}`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','User-Agent':client.userAgent},
+    body:JSON.stringify({videoId,context:{client}}),
+  });
+  if(!response.ok)throw new YouTubeVocabularyError(response.status===404?'VIDEO_UNAVAILABLE':'NETWORK_ERROR');
+  let player:PlayerResponse;
+  try{player=await response.json() as PlayerResponse}catch{throw new YouTubeVocabularyError('VIDEO_UNAVAILABLE')}
+  if(player.playabilityStatus?.status&&player.playabilityStatus.status!=='OK')throw new YouTubeVocabularyError(player.playabilityStatus.status==='LOGIN_REQUIRED'?'PRIVATE_VIDEO':'VIDEO_UNAVAILABLE');
+  return player;
+}
 
 async function getPlayerResponse(videoId:string){
-  return withRetry(async()=>{
-    const response=await fetchWithTimeout(`https://www.youtube.com/youtubei/v1/player?key=${INNERTUBE_API_KEY}`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','User-Agent':ANDROID_VR_CLIENT.userAgent},
-      body:JSON.stringify({videoId,context:{client:ANDROID_VR_CLIENT}}),
-    });
-    if(!response.ok)throw new YouTubeVocabularyError(response.status===404?'VIDEO_UNAVAILABLE':'NETWORK_ERROR');
-    let player:PlayerResponse;
-    try{player=await response.json() as PlayerResponse}catch{throw new YouTubeVocabularyError('VIDEO_UNAVAILABLE')}
-    if(player.playabilityStatus?.status&&player.playabilityStatus.status!=='OK')throw new YouTubeVocabularyError(player.playabilityStatus.status==='LOGIN_REQUIRED'?'PRIVATE_VIDEO':'VIDEO_UNAVAILABLE');
-    return player;
-  },4);
+  let lastError:unknown;
+  for(const client of INNERTUBE_CLIENTS){
+    try{return await withRetry(()=>requestPlayer(videoId,client),2)}
+    catch(error){lastError=error}
+  }
+  throw lastError;
 }
 
 async function getTranscript(track:CaptionTrack){
