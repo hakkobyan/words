@@ -79,16 +79,18 @@ const INNERTUBE_API_KEY='AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
 const ANDROID_VR_CLIENT={clientName:'ANDROID_VR',clientVersion:'1.65.10',deviceMake:'Oculus',deviceModel:'Quest 3',androidSdkVersion:32,hl:'en',gl:'US',userAgent:'com.google.android.apps.youtube.vr.oculus/1.65.10 (Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip'};
 
 async function getPlayerResponse(videoId:string){
-  const response=await fetchWithTimeout(`https://www.youtube.com/youtubei/v1/player?key=${INNERTUBE_API_KEY}`,{
-    method:'POST',
-    headers:{'Content-Type':'application/json','User-Agent':ANDROID_VR_CLIENT.userAgent},
-    body:JSON.stringify({videoId,context:{client:ANDROID_VR_CLIENT}}),
-  });
-  if(!response.ok)throw new YouTubeVocabularyError(response.status===404?'VIDEO_UNAVAILABLE':'NETWORK_ERROR');
-  let player:PlayerResponse;
-  try{player=await response.json() as PlayerResponse}catch{throw new YouTubeVocabularyError('VIDEO_UNAVAILABLE')}
-  if(player.playabilityStatus?.status&&player.playabilityStatus.status!=='OK')throw new YouTubeVocabularyError(player.playabilityStatus.status==='LOGIN_REQUIRED'?'PRIVATE_VIDEO':'VIDEO_UNAVAILABLE');
-  return player;
+  return withRetry(async()=>{
+    const response=await fetchWithTimeout(`https://www.youtube.com/youtubei/v1/player?key=${INNERTUBE_API_KEY}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','User-Agent':ANDROID_VR_CLIENT.userAgent},
+      body:JSON.stringify({videoId,context:{client:ANDROID_VR_CLIENT}}),
+    });
+    if(!response.ok)throw new YouTubeVocabularyError(response.status===404?'VIDEO_UNAVAILABLE':'NETWORK_ERROR');
+    let player:PlayerResponse;
+    try{player=await response.json() as PlayerResponse}catch{throw new YouTubeVocabularyError('VIDEO_UNAVAILABLE')}
+    if(player.playabilityStatus?.status&&player.playabilityStatus.status!=='OK')throw new YouTubeVocabularyError(player.playabilityStatus.status==='LOGIN_REQUIRED'?'PRIVATE_VIDEO':'VIDEO_UNAVAILABLE');
+    return player;
+  },4);
 }
 
 async function getTranscript(track:CaptionTrack){
