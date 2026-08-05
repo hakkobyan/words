@@ -11,7 +11,7 @@ export default function YouTubeVocabularyCard({item,selected,isKnown,onSelectedC
   return <article className="card p-5 md:p-6">
     <div className="flex items-start gap-3">
       <label className="pt-1.5" aria-label={`Select ${item.word}`}>
-        <input className="w-5 h-5" type="checkbox" checked={selected} disabled={isKnown} onChange={event=>onSelectedChange(event.target.checked)}/>
+        <input type="checkbox" checked={selected} disabled={isKnown} onChange={event=>onSelectedChange(event.target.checked)}/>
       </label>
       <div className="flex-1 min-w-0">
         <div className="flex flex-wrap items-start justify-between gap-3">
