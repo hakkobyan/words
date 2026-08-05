@@ -3,6 +3,10 @@ import {promisify} from 'node:util';
 import {NextResponse} from 'next/server';
 import {curateTranscript,parseYoutubeUrl,TranscriptCue,VideoVocabularyItem} from '@/lib/youtube-vocabulary';
 import {StudyLanguage} from '@/types';
+import englishDictionaryWords from 'an-array-of-english-words';
+import germanDictionaryWords from 'an-array-of-german-words';
+import englishFrequency from '@/data/frequency/en.json';
+import germanFrequency from '@/data/frequency/de.json';
 
 type CaptionTrack={baseUrl:string;languageCode:string;kind?:string};
 type PlayerResponse={videoDetails?:{title?:string;lengthSeconds?:string;videoId?:string};playabilityStatus?:{status?:string;reason?:string};captions?:{playerCaptionsTracklistRenderer?:{captionTracks?:CaptionTrack[]}}};
@@ -22,8 +26,24 @@ const cleanCaptionText=(value:string)=>value.replace(/<[^>]+>/g,' ').replace(/&a
 const normalizeTrackLanguage=(value:string)=>value.toLowerCase().replace(/^a\./,'').split(/[-_]/)[0];
 const normalizeToken=(value:string)=>value.toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\p{L}0-9'-]+/gu,'').trim();
 
-const englishStopwords=new Set(['the','and','you','that','with','this','from','have','for','are','was','were','there','what','when','where','which','your','their','they','them','will','would','could','should','about','after','before','into','over','under','between','because','while','than','then','those','these','here','very','just','also','only','more','most','some','such','each','much','many','like','been','being','through','during','without','within','again','ever','never','even','make','made','get','got','take','takes','took','think','know','said','say','says','yes','no','not','can','cannot','dont','does','did','doing','done','one','two','three','let','lets','video','videos','minute','english','german','learn','learning']);
+const englishStopwords=new Set(['the','and','you','that','with','this','from','have','for','are','was','were','there','what','when','where','which','your','their','they','them','will','would','could','should','about','after','before','into','over','under','between','because','while','than','then','those','these','here','very','just','also','only','more','most','some','such','each','much','many','like','been','being','through','during','without','within','again','ever','never','even','make','made','get','got','take','takes','took','think','know','said','say','says','yes','no','not','can','cannot','dont','does','did','doing','done','one','two','three','let','lets','video','videos','minute','english','german','learn','learning','gotta','wanna','gonna','kinda','sorta','gimme','lemme']);
 const germanStopwords=new Set(['der','die','das','und','oder','aber','weil','dass','mit','von','für','auf','ist','sind','war','waren','sein','hat','haben','hatte','werden','wird','nicht','nur','auch','noch','schon','sehr','mehr','weniger','dies','diese','dieser','dieses','hier','dort','dann','wenn','wie','was','wer','wo','warum','man','wir','ihr','sie','ich','du','er','es','ein','eine','einer','eines','einem','einen','zum','zur','ins','im','am','an','bei','nach','vor','über','unter','zwischen','ohne','gegen','während','video','videos','minute','deutsch','deutsche','lernen','lern']);
+
+const englishDictionary=new Set(englishDictionaryWords as string[]);
+const germanDictionary=new Set(germanDictionaryWords as string[]);
+const englishFrequencyRank=new Map((englishFrequency as string[]).map((word,index)=>[word,index]));
+const germanFrequencyRank=new Map((germanFrequency as string[]).map((word,index)=>[word,index]));
+
+function selectDictionary(language:StudyLanguage){
+  return language==='english'?englishDictionary:germanDictionary;
+}
+
+function isRealWord(word:string,language:StudyLanguage){
+  const dictionary=selectDictionary(language);
+  if(dictionary.has(word))return true;
+  if(!word.includes('-'))return false;
+  return word.split('-').every(part=>part.length>0&&dictionary.has(part));
+}
 
 async function fetchWithTimeout(url:string,init?:RequestInit){
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
@@ -90,12 +110,40 @@ function normalizeCandidateWord(value:string){
   return normalizeToken(value).replace(/^'+|'+$/g,'');
 }
 
-function estimateLevel(word:string,count:number):VideoVocabularyItem['level']{
-  const length=word.length;
-  if(count>=5||length<=4)return 'B1';
-  if(count>=3||length<=7)return 'B2';
-  if(length<=10)return 'C1';
-  return 'C2';
+function candidateStems(word:string,language:StudyLanguage){
+  const stems=[word];
+  if(language==='german'){
+    for(const suffix of ['en','em','er','es','e','st','t'])if(word.length>suffix.length+2&&word.endsWith(suffix))stems.push(word.slice(0,-suffix.length));
+    return stems;
+  }
+  const pushDoubledConsonant=(base:string)=>{if(base.length>2&&base.at(-1)===base.at(-2)&&!'aeiou'.includes(base.at(-1)!))stems.push(base.slice(0,-1))};
+  if(word.endsWith('ies')&&word.length>4)stems.push(word.slice(0,-3)+'y');
+  else if(word.endsWith('es')&&word.length>4)stems.push(word.slice(0,-2));
+  else if(word.endsWith('s')&&!word.endsWith('ss')&&word.length>3)stems.push(word.slice(0,-1));
+  if(word.endsWith('ied')&&word.length>4)stems.push(word.slice(0,-3)+'y');
+  if(word.endsWith('ing')&&word.length>5){const base=word.slice(0,-3);stems.push(base,base+'e');pushDoubledConsonant(base)}
+  if(word.endsWith('ed')&&word.length>4){const base=word.slice(0,-2);stems.push(base,base+'e');pushDoubledConsonant(base)}
+  return stems;
+}
+
+function frequencyRank(word:string,language:StudyLanguage){
+  const map=language==='english'?englishFrequencyRank:germanFrequencyRank;
+  let best:number|undefined;
+  for(const stem of candidateStems(word,language)){
+    const rank=map.get(stem);
+    if(rank!==undefined&&(best===undefined||rank<best))best=rank;
+  }
+  return best;
+}
+
+function estimateLevel(word:string,language:StudyLanguage):VideoVocabularyItem['level']{
+  const rank=frequencyRank(word,language);
+  if(rank===undefined)return word.length<=9?'C1':'C2';
+  if(rank<1000)return 'A1';
+  if(rank<2500)return 'A2';
+  if(rank<5000)return 'B1';
+  if(rank<9000)return 'B2';
+  return 'C1';
 }
 
 function inferPartOfSpeech(word:string,language:StudyLanguage){
@@ -122,7 +170,7 @@ function collectFallbackCandidates(cues:TranscriptCue[],language:StudyLanguage,e
   for(const cue of cues){
     for(const token of cue.text.split(/\s+/)){
       const word=normalizeCandidateWord(token);
-      if(!word||word.length<4||stopwords.has(word)||excludeWords.has(word))continue;
+      if(!word||word.length<4||word.includes('\'')||stopwords.has(word)||excludeWords.has(word)||!isRealWord(word,language))continue;
       const current=occurrences.get(word);
       if(current)current.count++;
       else occurrences.set(word,{count:1,example:cue.text.trim(),timestampSeconds:cue.startSeconds});
@@ -152,7 +200,7 @@ async function buildFallbackVocabulary(cues:TranscriptCue[],language:StudyLangua
       word:candidate.word,
       pronunciation:'',
       partOfSpeech,
-      level:estimateLevel(candidate.word,candidate.count),
+      level:estimateLevel(candidate.word,language),
       translationRu:translations[index]||candidate.word,
       explanation:'Word from the video transcript.',
       example:candidate.example,
