@@ -1,6 +1,6 @@
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
-import {ProxyAgent} from 'undici';
+import {ProxyAgent,fetch as undiciFetch} from 'undici';
 import {NextResponse} from 'next/server';
 import {curateTranscript,parseYoutubeUrl,TranscriptCue,VideoVocabularyItem} from '@/lib/youtube-vocabulary';
 import {StudyLanguage} from '@/types';
@@ -61,7 +61,7 @@ async function withRetry<T>(attempt:()=>Promise<T>,attempts=3){
 
 async function fetchWithTimeout(url:string,init?:RequestInit){
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
-  try{return await fetch(url,{...init,signal:controller.signal,cache:'no-store',...(proxyAgent?{dispatcher:proxyAgent}:{})} as RequestInit)}catch(error){if((error as Error).name==='AbortError')throw new YouTubeVocabularyError('TIMEOUT');throw new YouTubeVocabularyError('NETWORK_ERROR')}finally{clearTimeout(timer)}
+  try{return await undiciFetch(url,{...init,signal:controller.signal,cache:'no-store',...(proxyAgent?{dispatcher:proxyAgent}:{})} as Parameters<typeof undiciFetch>[1]) as unknown as Response}catch(error){if((error as Error).name==='AbortError')throw new YouTubeVocabularyError('TIMEOUT');throw new YouTubeVocabularyError('NETWORK_ERROR')}finally{clearTimeout(timer)}
 }
 
 function readJsonObject(source:string,marker:string){
