@@ -48,6 +48,16 @@ function isRealWord(word:string,language:StudyLanguage){
 
 const proxyUrl=process.env.YOUTUBE_PROXY_URL;
 const proxyAgent=proxyUrl?new ProxyAgent(proxyUrl):null;
+const browserHeaders={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36','Accept-Language':'en-US,en;q=0.9','Referer':'https://www.youtube.com/'};
+
+async function withRetry<T>(attempt:()=>Promise<T>,attempts=3){
+  let lastError:unknown;
+  for(let index=0;index<attempts;index++){
+    try{return await attempt()}
+    catch(error){lastError=error;if(index<attempts-1)await new Promise(resolve=>setTimeout(resolve,300*(index+1)))}
+  }
+  throw lastError;
+}
 
 async function fetchWithTimeout(url:string,init?:RequestInit){
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
@@ -85,7 +95,7 @@ function readTimedTextTracks(source:string){
 }
 
 async function getPlayerResponse(videoUrl:string){
-  const response=await fetchWithTimeout(videoUrl,{headers:{'User-Agent':'Mozilla/5.0 (compatible; words-vocabulary/1.0)','Accept-Language':'en-US,en;q=0.9'}});
+  const response=await fetchWithTimeout(videoUrl,{headers:browserHeaders});
   if(!response.ok)throw new YouTubeVocabularyError(response.status===404?'VIDEO_UNAVAILABLE':'NETWORK_ERROR');
   const page=await response.text();
   const player=readJsonObject(page,'ytInitialPlayerResponse =')||readJsonObject(page,'var ytInitialPlayerResponse =');
@@ -95,15 +105,17 @@ async function getPlayerResponse(videoUrl:string){
 }
 
 async function getTranscript(track:CaptionTrack){
-  const url=new URL(track.baseUrl);
-  url.searchParams.set('fmt','json3');
-  const response=await fetchWithTimeout(url.toString(),{headers:{'User-Agent':'Mozilla/5.0 (compatible; words-vocabulary/1.0)'}});
-  if(!response.ok)throw new YouTubeVocabularyError('NO_SUBTITLES');
-  let payload:CaptionPayload;
-  try{payload=await response.json() as CaptionPayload}catch{throw new YouTubeVocabularyError('NO_SUBTITLES')}
-  const cues=(payload.events||[]).map(event=>({text:cleanCaptionText((event.segs||[]).map(segment=>segment.utf8||'').join('')),startSeconds:Math.max(0,Math.round((event.tStartMs||0)/1000))})).filter((cue):cue is TranscriptCue=>Boolean(cue.text));
-  if(!cues.length)throw new YouTubeVocabularyError('NO_SUBTITLES');
-  return cues;
+  return withRetry(async()=>{
+    const url=new URL(track.baseUrl);
+    url.searchParams.set('fmt','json3');
+    const response=await fetchWithTimeout(url.toString(),{headers:browserHeaders});
+    if(!response.ok)throw new YouTubeVocabularyError('NO_SUBTITLES');
+    let payload:CaptionPayload;
+    try{payload=await response.json() as CaptionPayload}catch{throw new YouTubeVocabularyError('NO_SUBTITLES')}
+    const cues=(payload.events||[]).map(event=>({text:cleanCaptionText((event.segs||[]).map(segment=>segment.utf8||'').join('')),startSeconds:Math.max(0,Math.round((event.tStartMs||0)/1000))})).filter((cue):cue is TranscriptCue=>Boolean(cue.text));
+    if(!cues.length)throw new YouTubeVocabularyError('NO_SUBTITLES');
+    return cues;
+  });
 }
 
 function selectStopwords(language:StudyLanguage){
@@ -245,7 +257,7 @@ async function getTranscriptFromYtDlp(videoUrl:string,language:StudyLanguage){
       const info=JSON.parse(stdout) as YtDlpInfo;
       const subtitleUrl=pickYtDlpSubtitleUrl(info,language);
       if(!subtitleUrl)continue;
-      const response=await fetchWithTimeout(subtitleUrl,{headers:{'User-Agent':'Mozilla/5.0 (compatible; words-vocabulary/1.0)'}});
+      const response=await fetchWithTimeout(subtitleUrl,{headers:browserHeaders});
       if(!response.ok)continue;
       let payload:CaptionPayload;
       try{payload=await response.json() as CaptionPayload}catch{continue}
@@ -260,7 +272,7 @@ async function getTranscriptFromYtDlp(videoUrl:string,language:StudyLanguage){
 }
 
 async function getTrackList(videoId:string){
-  const response=await fetchWithTimeout(`https://www.youtube.com/api/timedtext?v=${encodeURIComponent(videoId)}&type=list&hl=en`,{headers:{'User-Agent':'Mozilla/5.0 (compatible; words-vocabulary/1.0)'}});
+  const response=await fetchWithTimeout(`https://www.youtube.com/api/timedtext?v=${encodeURIComponent(videoId)}&type=list&hl=en`,{headers:browserHeaders});
   if(!response.ok)return [];
   const xml=await response.text();
   return readTimedTextTracks(xml).map(track=>({
