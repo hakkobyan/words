@@ -307,6 +307,7 @@ export async function POST(request:Request){
       const fallbackTranscript=await getTranscriptFromYtDlp(source.url,body.language);
       if(fallbackTranscript?.length)transcript=fallbackTranscript;
     }
+    if(!transcript.length)throw new YouTubeVocabularyError('CAPTION_FETCH_BLOCKED');
 
     const curated=curateTranscript(transcript,body.language);
     const fallback=curated.length>=8?[]:await buildFallbackVocabulary(transcript,body.language,new Set(curated.map(item=>normalizeCandidateWord(item.word))));
@@ -329,7 +330,7 @@ export async function POST(request:Request){
     });
   }catch(error){
     const code=error instanceof YouTubeVocabularyError?error.code:'NETWORK_ERROR';
-    const status=code==='INVALID_URL'?400:code==='NO_SUBTITLES'||code==='UNSUPPORTED_LANGUAGE'||code==='NO_USEFUL_VOCABULARY'?422:code==='TIMEOUT'?504:502;
+    const status=code==='INVALID_URL'?400:code==='NO_SUBTITLES'||code==='UNSUPPORTED_LANGUAGE'||code==='NO_USEFUL_VOCABULARY'?422:code==='TIMEOUT'?504:code==='CAPTION_FETCH_BLOCKED'?503:502;
     return NextResponse.json({error:code},{status});
   }
 }
