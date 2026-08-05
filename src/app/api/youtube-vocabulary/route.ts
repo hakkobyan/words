@@ -1,5 +1,6 @@
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
+import {ProxyAgent} from 'undici';
 import {NextResponse} from 'next/server';
 import {curateTranscript,parseYoutubeUrl,TranscriptCue,VideoVocabularyItem} from '@/lib/youtube-vocabulary';
 import {StudyLanguage} from '@/types';
@@ -45,9 +46,12 @@ function isRealWord(word:string,language:StudyLanguage){
   return word.split('-').every(part=>part.length>0&&dictionary.has(part));
 }
 
+const proxyUrl=process.env.YOUTUBE_PROXY_URL;
+const proxyAgent=proxyUrl?new ProxyAgent(proxyUrl):null;
+
 async function fetchWithTimeout(url:string,init?:RequestInit){
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
-  try{return await fetch(url,{...init,signal:controller.signal,cache:'no-store'})}catch(error){if((error as Error).name==='AbortError')throw new YouTubeVocabularyError('TIMEOUT');throw new YouTubeVocabularyError('NETWORK_ERROR')}finally{clearTimeout(timer)}
+  try{return await fetch(url,{...init,signal:controller.signal,cache:'no-store',...(proxyAgent?{dispatcher:proxyAgent}:{})} as RequestInit)}catch(error){if((error as Error).name==='AbortError')throw new YouTubeVocabularyError('TIMEOUT');throw new YouTubeVocabularyError('NETWORK_ERROR')}finally{clearTimeout(timer)}
 }
 
 function readJsonObject(source:string,marker:string){
