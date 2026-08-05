@@ -64,25 +64,6 @@ async function fetchWithTimeout(url:string,init?:RequestInit){
   try{return await undiciFetch(url,{...init,signal:controller.signal,cache:'no-store',...(proxyAgent?{dispatcher:proxyAgent}:{})} as Parameters<typeof undiciFetch>[1]) as unknown as Response}catch(error){if((error as Error).name==='AbortError')throw new YouTubeVocabularyError('TIMEOUT');throw new YouTubeVocabularyError('NETWORK_ERROR')}finally{clearTimeout(timer)}
 }
 
-function readJsonObject(source:string,marker:string){
-  const markerIndex=source.indexOf(marker);
-  if(markerIndex<0)return null;
-  const start=source.indexOf('{',markerIndex+marker.length);
-  if(start<0)return null;
-  let depth=0,inString=false,escaped=false;
-  for(let index=start;index<source.length;index++){
-    const character=source[index];
-    if(inString){if(escaped)escaped=false;else if(character==='\\')escaped=true;else if(character==='"')inString=false;continue}
-    if(character==='"'){inString=true;continue}
-    if(character==='{')depth++;
-    if(character==='}'){
-      depth--;
-      if(depth===0){try{return JSON.parse(source.slice(start,index+1)) as PlayerResponse}catch{return null}}
-    }
-  }
-  return null;
-}
-
 function readTimedTextTracks(source:string){
   return [...source.matchAll(/<track\b([^>]*)\/>/g)].map(match=>{
     const attributes=Object.fromEntries([...match[1].matchAll(/([\w-]+)="([^"]*)"/g)].map(([_,key,value])=>[key,value]));
@@ -94,12 +75,18 @@ function readTimedTextTracks(source:string){
   }).filter(track=>track.languageCode);
 }
 
-async function getPlayerResponse(videoUrl:string){
-  const response=await fetchWithTimeout(videoUrl,{headers:browserHeaders});
+const INNERTUBE_API_KEY='AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
+const ANDROID_VR_CLIENT={clientName:'ANDROID_VR',clientVersion:'1.65.10',deviceMake:'Oculus',deviceModel:'Quest 3',androidSdkVersion:32,hl:'en',gl:'US',userAgent:'com.google.android.apps.youtube.vr.oculus/1.65.10 (Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip'};
+
+async function getPlayerResponse(videoId:string){
+  const response=await fetchWithTimeout(`https://www.youtube.com/youtubei/v1/player?key=${INNERTUBE_API_KEY}`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','User-Agent':ANDROID_VR_CLIENT.userAgent},
+    body:JSON.stringify({videoId,context:{client:ANDROID_VR_CLIENT}}),
+  });
   if(!response.ok)throw new YouTubeVocabularyError(response.status===404?'VIDEO_UNAVAILABLE':'NETWORK_ERROR');
-  const page=await response.text();
-  const player=readJsonObject(page,'ytInitialPlayerResponse =')||readJsonObject(page,'var ytInitialPlayerResponse =');
-  if(!player)throw new YouTubeVocabularyError('VIDEO_UNAVAILABLE');
+  let player:PlayerResponse;
+  try{player=await response.json() as PlayerResponse}catch{throw new YouTubeVocabularyError('VIDEO_UNAVAILABLE')}
   if(player.playabilityStatus?.status&&player.playabilityStatus.status!=='OK')throw new YouTubeVocabularyError(player.playabilityStatus.status==='LOGIN_REQUIRED'?'PRIVATE_VIDEO':'VIDEO_UNAVAILABLE');
   return player;
 }
@@ -311,7 +298,7 @@ export async function POST(request:Request){
     const source=body.url?parseYoutubeUrl(body.url):null;
     if(!source)throw new YouTubeVocabularyError('INVALID_URL');
     if(body.language!=='english'&&body.language!=='german')throw new YouTubeVocabularyError('UNSUPPORTED_LANGUAGE');
-    const player=await getPlayerResponse(source.url);
+    const player=await getPlayerResponse(source.id);
     const tracks=[...(player.captions?.playerCaptionsTracklistRenderer?.captionTracks||[]),...(await getTrackList(source.id))];
     if(!tracks.length)throw new YouTubeVocabularyError('NO_SUBTITLES');
     const track=pickCaptionTrack(tracks,body.language);
