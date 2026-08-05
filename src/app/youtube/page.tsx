@@ -13,6 +13,7 @@ const errors:Record<string,{title:string;text:string}>={
   PRIVATE_VIDEO:{title:'This video is not available',text:'It may be private, deleted, or unavailable in your region.'},
   VIDEO_UNAVAILABLE:{title:'This video is not available',text:'It may be private, deleted, or unavailable in your region.'},
   NO_SUBTITLES:{title:'No subtitles were found for this video',text:'Try another video with captions in your learning language.'},
+  CAPTION_FETCH_BLOCKED:{title:'YouTube blocked this request',text:'YouTube is rate-limiting caption requests from this server (common on cloud hosting like Vercel). This usually resolves on retry after a short wait, or may require a proxy for the server. It is not an issue with this specific video.'},
   UNSUPPORTED_LANGUAGE:{title:'This subtitle language is unsupported',text:'Choose English or German, then try a video with matching captions.'},
   NO_USEFUL_VOCABULARY:{title:'No useful vocabulary was found',text:'The captions contain no curated terms at this level. Try a longer or more detailed video.'},
   TIMEOUT:{title:'The request took too long',text:'YouTube did not respond in time. Please try again.'},
