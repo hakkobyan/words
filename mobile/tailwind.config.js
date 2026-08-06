@@ -1,0 +1,37 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  darkMode: 'class',
+  content: ['./app/**/*.{js,jsx,ts,tsx}', './src/**/*.{js,jsx,ts,tsx}'],
+  presets: [require('nativewind/preset')],
+  theme: {
+    extend: {
+      colors: {
+        ink: 'var(--ink)',
+        muted: 'var(--muted)',
+        paper: 'var(--paper)',
+        'paper-2': 'var(--paper-2)',
+        card: 'var(--card)',
+        'card-strong': 'var(--card-strong)',
+        green: 'var(--green)',
+        mint: 'var(--mint)',
+        orange: 'var(--orange)',
+        line: 'var(--line)',
+        danger: 'var(--danger)',
+        success: 'var(--success)',
+        'primary-bg': 'var(--primary-bg)',
+        'on-primary': 'var(--on-primary)',
+        'on-secondary': 'var(--on-secondary)',
+        'hero-bg': 'var(--hero-bg)',
+        'hero-text': 'var(--hero-text)',
+        'hero-action-bg': 'var(--hero-action-bg)',
+        'hero-action-text': 'var(--hero-action-text)',
+        'correct-bg': 'var(--correct-bg)',
+        'correct-text': 'var(--correct-text)',
+        'wrong-bg': 'var(--wrong-bg)',
+        'wrong-text': 'var(--wrong-text)',
+        placeholder: 'var(--placeholder)',
+      },
+    },
+  },
+  plugins: [],
+};
