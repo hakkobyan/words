@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Alert, ScrollView, Switch, Text, View } from 'react-native';
 import { Download, RotateCcw, Trash2, Upload } from 'lucide-react-native';
 import * as Sharing from 'expo-sharing';
+import * as DocumentPicker from 'expo-document-picker';
 import { File, Paths } from 'expo-file-system';
 import Slider from '@react-native-community/slider';
 import { useVocabularyStore } from '@/store/useVocabularyStore';
@@ -41,9 +42,9 @@ export default function Settings() {
 
   const importData = async () => {
     try {
-      const result = await File.pickFileAsync({ mimeTypes: ['application/json'] });
+      const result = await DocumentPicker.getDocumentAsync({ type: 'application/json', copyToCacheDirectory: true });
       if (result.canceled) return;
-      const data = JSON.parse(await result.result.text());
+      const data = JSON.parse(await new File(result.assets[0].uri).text());
       if (!Array.isArray(data.words) || !Array.isArray(data.categories) || !Array.isArray(data.sessions)) throw new Error('INVALID_BACKUP');
       store.replaceData(data);
       setMessage(pick(`Импортировано ${data.words.length} слов`, `Imported ${data.words.length} words`));
