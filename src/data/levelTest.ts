@@ -58,13 +58,3 @@ export function scoreToLevel(score:number):CefrLevel{
   if(score<=17)return 'C1';
   return 'C2';
 }
-
-function normalizeAnswer(value:string):string{
-  return value.trim().toLowerCase().replace(/[.,!?;:"'()]/g,'').replace(/ё/g,'е');
-}
-
-export function isCorrectAnswer(input:string,answers:string[]):boolean{
-  const normalized=normalizeAnswer(input);
-  if(!normalized)return false;
-  return answers.some(answer=>normalizeAnswer(answer)===normalized);
-}

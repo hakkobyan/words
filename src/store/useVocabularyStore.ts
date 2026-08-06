@@ -8,7 +8,8 @@ import {Category,Settings,StudyLanguage,UserWord,VocabularySession} from '@/type
 const baseSettings:Settings={theme:'system',interfaceLanguage:'ru',defaultLanguage:'english',learnerLevel:'B1',cardsPerSession:10,showExamples:true,shuffle:true,reverse:true,autoCategory:true,onboardingCompleted:false};
 type NewWord=Omit<UserWord,'id'|'createdAt'|'updatedAt'>;
 type Store={
-  words:UserWord[];categories:Category[];sessions:VocabularySession[];settings:Settings;isHydrated:boolean;
+  words:UserWord[];categories:Category[];sessions:VocabularySession[];settings:Settings;seenDailyIds:string[];isHydrated:boolean;
+  markDailySeen:(ids:string[])=>void;
   hydrate:()=>void;addWord:(word:NewWord)=>void;addWords:(words:NewWord[])=>void;updateWord:(id:string,patch:Partial<UserWord>)=>void;deleteWord:(id:string)=>void;
   addCategory:(name:string,icon:string)=>void;deleteCategory:(id:string,withWords?:boolean)=>void;addSession:(name:string,language:StudyLanguage)=>string;updateSession:(id:string,patch:Partial<VocabularySession>)=>void;deleteSession:(id:string)=>void;
   setSettings:(patch:Partial<Settings>)=>void;replaceData:(data:{words:UserWord[];categories:Category[];sessions:VocabularySession[];settings?:Settings})=>void;resetProgress:()=>void;clear:()=>void;
@@ -16,7 +17,8 @@ type Store={
 const persist=(state:{words:UserWord[];categories:Category[];sessions:VocabularySession[];settings:Settings})=>{write('words',state.words);write('categories',state.categories);write('sessions',state.sessions);write('settings',state.settings)};
 
 export const useVocabularyStore=create<Store>((set,get)=>({
-  words:[],categories:defaults,sessions:[],settings:baseSettings,isHydrated:false,
+  words:[],categories:defaults,sessions:[],settings:baseSettings,seenDailyIds:[],isHydrated:false,
+  markDailySeen:ids=>set(state=>{const seenDailyIds=[...new Set([...state.seenDailyIds,...ids])];write('seenDaily',seenDailyIds);return {seenDailyIds}}),
   hydrate:()=>{
     if(get().isHydrated)return;
     let sessions=read<VocabularySession[]>('sessions',[]);
@@ -25,7 +27,7 @@ export const useVocabularyStore=create<Store>((set,get)=>({
     words=words.filter(word=>!word.demo);
     sessions=sessions.filter(session=>!session.id.startsWith('demo-'));
     const state={words,categories:read('categories',defaults),sessions,settings:{...baseSettings,...read<Partial<Settings>>('settings',{})},isHydrated:true};
-    set(state);
+    set({...state,seenDailyIds:read<string[]>('seenDaily',[])});
     persist(state);
   },
   addWord:word=>{
@@ -61,5 +63,5 @@ export const useVocabularyStore=create<Store>((set,get)=>({
   setSettings:patch=>set(state=>{const next={settings:{...state.settings,...patch}};persist({...state,...next});return next}),
   replaceData:data=>set(state=>{const next={...data,settings:{...baseSettings,...(data.settings||state.settings)}};persist(next);return next}),
   resetProgress:()=>set(state=>{const next={words:state.words.map(word=>({...word,learned:false,difficulty:'new' as const,correctAnswers:0,wrongAnswers:0,nextReviewAt:undefined,lastReviewedAt:undefined}))};persist({...state,...next});return next}),
-  clear:()=>{const next={words:[],sessions:[],categories:defaults,settings:baseSettings};persist(next);set(next);},
+  clear:()=>{const next={words:[],sessions:[],categories:defaults,settings:baseSettings};persist(next);write('seenDaily',[]);set({...next,seenDailyIds:[]});},
 }));

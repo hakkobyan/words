@@ -5,7 +5,9 @@ import {ClipboardList, Sparkles} from 'lucide-react';
 import {useVocabularyStore} from '@/store/useVocabularyStore';
 import {useI18n} from '@/lib/i18n';
 import {LanguageSelector, Progress} from '@/components/ui/Parts';
-import {isCorrectAnswer, levelTestWords, scoreToLevel} from '@/data/levelTest';
+import {levelTestWords, scoreToLevel} from '@/data/levelTest';
+import {isCorrectAnswer} from '@/lib/answers';
+import {dailySession} from '@/lib/dailyWords';
 import {CEFR_LEVELS, CefrLevel, StudyLanguage} from '@/types';
 
 const levelHints: Record<CefrLevel, [string, string]> = {
@@ -32,6 +34,8 @@ export default function Onboarding() {
   const words = levelTestWords[language];
 
   const finish = (level: CefrLevel) => {
+    // The level test already covered plenty of typing — start the daily warm-up next launch.
+    dailySession.markHandled();
     setSettings({defaultLanguage: language, learnerLevel: level, onboardingCompleted: true});
   };
 
