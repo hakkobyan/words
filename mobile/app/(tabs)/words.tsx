@@ -46,6 +46,7 @@ export default function Words() {
             </View>
             <SearchBox value={q} onChange={setQ} />
             <Select
+              label={pick('Язык', 'Language')}
               value={lang}
               onChange={setLang}
               options={[
@@ -55,6 +56,7 @@ export default function Words() {
               ]}
             />
             <Select
+              label={pick('Сортировка', 'Sort by')}
               value={sort}
               onChange={setSort}
               options={[

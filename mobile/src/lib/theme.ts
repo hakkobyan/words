@@ -7,3 +7,15 @@ export function useThemeColors(){
   const {colorScheme}=useColorScheme();
   return colorScheme==='dark'?dark:light;
 }
+
+export function useIsDarkTheme(){
+  const {colorScheme}=useColorScheme();
+  return colorScheme==='dark';
+}
+
+/** Same colour, made see-through — for surfaces that blur what is behind them. */
+export function withAlpha(hex:string,alpha:number){
+  const value=hex.replace('#','');
+  const r=parseInt(value.slice(0,2),16),g=parseInt(value.slice(2,4),16),b=parseInt(value.slice(4,6),16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}

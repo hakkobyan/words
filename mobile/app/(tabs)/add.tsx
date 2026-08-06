@@ -150,11 +150,12 @@ export default function Add() {
         <View className="gap-4">
           <View className="gap-2">
             <Text className="font-bold text-sm text-ink">{pick('Категория', 'Category')}</Text>
-            <Select value={cat} onChange={setCat} options={s.categories.map((c) => ({ value: c.id, label: c.name }))} />
+            <Select label={pick('Категория', 'Category')} value={cat} onChange={setCat} options={s.categories.map((c) => ({ value: c.id, label: c.name }))} />
           </View>
           <View className="gap-2">
             <Text className="font-bold text-sm text-ink">{pick('Сеанс', 'Session')}</Text>
             <Select
+              label={pick('Сеанс', 'Session')}
               value={activeSession}
               onChange={setSession}
               options={[{ value: '', label: pick('Создать автоматически', 'Create automatically') }, ...validSessions.map((v) => ({ value: v.id, label: v.name }))]}

@@ -85,6 +85,7 @@ export default function Settings() {
         <View className="gap-2">
           <Text className="font-bold text-sm text-ink">{pick('Язык интерфейса', 'Interface language')}</Text>
           <Select
+            label={pick('Язык интерфейса', 'Interface language')}
             value={locale}
             onChange={(v) => store.setSettings({ interfaceLanguage: v })}
             options={[
@@ -96,6 +97,7 @@ export default function Settings() {
         <View className="gap-2">
           <Text className="font-bold text-sm text-ink">{pick('Тема', 'Theme')}</Text>
           <Select
+            label={pick('Тема', 'Theme')}
             value={store.settings.theme}
             onChange={(v) => store.setSettings({ theme: v })}
             options={[
@@ -112,6 +114,7 @@ export default function Settings() {
         <View className="gap-2">
           <Text className="font-bold text-sm text-ink">{pick('Язык обучения', 'Learning language')}</Text>
           <Select
+            label={pick('Язык обучения', 'Learning language')}
             value={store.settings.defaultLanguage}
             onChange={(v: StudyLanguage) => store.setSettings({ defaultLanguage: v })}
             options={[
@@ -126,6 +129,7 @@ export default function Settings() {
         <View className="gap-2">
           <Text className="font-bold text-sm text-ink">{pick('Ваш текущий уровень', 'Your current level')}</Text>
           <Select
+            label={pick('Ваш текущий уровень', 'Your current level')}
             value={store.settings.learnerLevel}
             onChange={(v: CefrLevel) => store.setSettings({ learnerLevel: v })}
             options={CEFR_LEVELS.map((level) => ({ value: level, label: level }))}

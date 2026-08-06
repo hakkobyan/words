@@ -1,7 +1,7 @@
 import {useState} from 'react';
-import {ChevronDown,Languages,Leaf,Search} from 'lucide-react-native';
-import {Modal,Pressable,Text,TextInput,View,ViewStyle} from 'react-native';
-import {Picker} from '@react-native-picker/picker';
+import {Check,ChevronDown,Languages,Leaf,Search} from 'lucide-react-native';
+import {Modal,Pressable,ScrollView,Text,TextInput,View,ViewStyle} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {StudyLanguage} from '@/types';
 import {useI18n} from '@/lib/i18n';
 import {useThemeColors} from '@/lib/theme';
@@ -75,28 +75,57 @@ export function SearchBox({value,onChange}:{value:string;onChange:(s:string)=>vo
   );
 }
 
-export function Select<T extends string>({value,onChange,options}:{value:T;onChange:(v:T)=>void;options:{label:string;value:T}[]}){
+/**
+ * A sheet of options rather than a platform picker. The native picker renders
+ * as an unstyleable <select> on web — an iOS wheel pinned to the bottom of the
+ * browser, ignoring the app's colours entirely — and takes two taps to change
+ * a value. This looks the same everywhere and commits on the first tap.
+ */
+export function Select<T extends string>({value,onChange,options,label}:{value:T;onChange:(v:T)=>void;options:{label:string;value:T}[];label?:string}){
   const colors=useThemeColors();
   const {t}=useI18n();
+  const insets=useSafeAreaInsets();
   const [open,setOpen]=useState(false);
   const current=options.find(o=>o.value===value);
+  const choose=(next:T)=>{onChange(next);setOpen(false)};
   return (
     <>
-      <Pressable onPress={()=>setOpen(true)} accessibilityRole="button"
-        className="min-h-12 bg-card-strong border border-line rounded-2xl px-4 flex-row items-center justify-between">
-        <Text className="text-ink">{current?.label??''}</Text>
-        <ChevronDown size={17} color={colors.muted}/>
+      <Pressable onPress={()=>setOpen(true)} accessibilityRole="button" accessibilityLabel={label} accessibilityValue={{text:current?.label}}
+        className="min-h-12 bg-card-strong border border-line rounded-2xl px-4 flex-row items-center justify-between active:opacity-70">
+        <Text className="text-ink font-medium flex-1" numberOfLines={1}>{current?.label??''}</Text>
+        <ChevronDown size={18} color={colors.green}/>
       </Pressable>
-      <Modal visible={open} transparent animationType="slide" onRequestClose={()=>setOpen(false)}>
-        <Pressable style={{flex:1,backgroundColor:'rgba(0,0,0,0.3)'}} onPress={()=>setOpen(false)}/>
-        <View className="bg-card-strong">
-          <View className="flex-row justify-end p-3 border-b border-line">
-            <Pressable onPress={()=>setOpen(false)}><Text className="text-green font-bold">{t('done')}</Text></Pressable>
-          </View>
-          <Picker selectedValue={value} onValueChange={(v)=>onChange(v as T)} itemStyle={{color:colors.ink}}>
-            {options.map(o=><Picker.Item key={o.value} label={o.label} value={o.value} color={colors.ink}/>)}
-          </Picker>
-        </View>
+
+      <Modal visible={open} transparent animationType="fade" statusBarTranslucent onRequestClose={()=>setOpen(false)}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('done')}
+          onPress={()=>setOpen(false)}
+          style={{flex:1,backgroundColor:'rgba(20,12,8,0.45)',justifyContent:'flex-end'}}
+        >
+          {/* Swallows taps so choosing an option does not dismiss via the backdrop. */}
+          <Pressable onPress={()=>{}} className="bg-card rounded-t-[26px] border-t border-line overflow-hidden" style={{paddingBottom:insets.bottom+8,maxHeight:'75%'}}>
+            <View className="items-center pt-3 pb-1"><View className="h-1 w-10 rounded-full bg-line"/></View>
+            {!!label&&<Text className="text-muted text-xs font-bold uppercase tracking-wider px-5 pt-2 pb-1">{label}</Text>}
+            <ScrollView bounces={false}>
+              {options.map((option,index)=>{
+                const selected=option.value===value;
+                return (
+                  <Pressable
+                    key={option.value}
+                    accessibilityRole="button"
+                    accessibilityState={{selected}}
+                    onPress={()=>choose(option.value)}
+                    className={`min-h-14 px-5 flex-row items-center justify-between active:bg-paper-2 ${index?'border-t border-line':''}`}
+                  >
+                    <Text className={`text-base flex-1 ${selected?'text-green font-bold':'text-ink'}`}>{option.label}</Text>
+                    {selected&&<Check size={19} color={colors.green}/>}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </Pressable>
+        </Pressable>
       </Modal>
     </>
   );
