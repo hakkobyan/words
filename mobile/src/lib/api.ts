@@ -1,11 +1,15 @@
+import {Platform} from 'react-native';
 import {StudyLanguage} from '@/types';
 import {VideoAnalysis} from '@/lib/youtube-vocabulary';
 
-// Production backend, deployed from the same repo's root Next.js app.
-// Override locally by setting EXPO_PUBLIC_API_BASE_URL in mobile/.env
-// (e.g. to point at a local `npm run dev` server instead).
+// The web build is served by the same deployment as the API, so it calls a
+// relative path and stays same-origin — an absolute URL would be cross-origin
+// on every deployment except production and get blocked by CORS. Native has no
+// origin to be relative to, so it needs the deployed URL.
+// Either can be pointed elsewhere with EXPO_PUBLIC_API_BASE_URL in mobile/.env.
 const DEFAULT_API_BASE_URL='https://words-ten-lemon.vercel.app';
-const API_BASE_URL=(process.env.EXPO_PUBLIC_API_BASE_URL??DEFAULT_API_BASE_URL).replace(/\/$/,'');
+const configuredBaseUrl=process.env.EXPO_PUBLIC_API_BASE_URL;
+const API_BASE_URL=(configuredBaseUrl??(Platform.OS==='web'?'':DEFAULT_API_BASE_URL)).replace(/\/$/,'');
 
 export async function translateWord(text:string,sourceLanguage:StudyLanguage,signal?:AbortSignal){
   const response=await fetch(`${API_BASE_URL}/api/translate`,{
