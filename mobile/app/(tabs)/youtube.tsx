@@ -327,6 +327,7 @@ export default function YouTubeVocabulary() {
               <View className="gap-2 mt-2">
                 <Text className="text-sm font-bold text-ink">Show vocabulary from level</Text>
                 <Select
+                  label="Show vocabulary from level"
                   value={minimumLevel}
                   onChange={setMinimumLevel}
                   options={CEFR_LEVELS.map((level) => ({ value: level, label: level === nextCefrLevel(store.settings.learnerLevel) ? `${level} · recommended for you` : level }))}

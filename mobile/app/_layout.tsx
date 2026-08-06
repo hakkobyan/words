@@ -5,6 +5,7 @@ import { Stack } from 'expo-router';
 import { colorScheme } from 'nativewind';
 import { useVocabularyStore } from '@/store/useVocabularyStore';
 import { useThemeColors } from '@/lib/theme';
+import { useI18n } from '@/lib/i18n';
 import { dailySession } from '@/lib/dailyWords';
 import Onboarding from '@/components/onboarding/Onboarding';
 import DailyWords from '@/components/daily/DailyWords';
@@ -17,6 +18,7 @@ export default function RootLayout() {
   const dailyDone = useSyncExternalStore(dailySession.subscribe, dailySession.isHandled, dailySession.isHandled);
   const systemScheme = useColorScheme();
   const colors = useThemeColors();
+  const { pick } = useI18n();
 
   useEffect(() => {
     hydrate();
@@ -39,13 +41,24 @@ export default function RootLayout() {
   if (isHydrated && !onboardingCompleted) return <Onboarding />;
   if (isHydrated && !dailyDone) return <DailyWords onDone={dailySession.markHandled} />;
 
+  // Without these the header keeps its platform default — a light grey bar that
+  // ignores the theme — and the titles were hardcoded Russian regardless of the
+  // interface language.
+  const header = {
+    headerShown: true,
+    headerStyle: { backgroundColor: colors.card },
+    headerTintColor: colors.green,
+    headerTitleStyle: { color: colors.ink, fontWeight: '700' as const },
+    headerShadowVisible: false,
+  };
+
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.paper } }}>
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="categories/index" options={{ headerShown: true, title: 'Категории' }} />
-      <Stack.Screen name="categories/[categoryId]" options={{ headerShown: true, title: '' }} />
-      <Stack.Screen name="sessions" options={{ headerShown: true, title: 'Сеансы' }} />
-      <Stack.Screen name="settings" options={{ headerShown: true, title: 'Настройки' }} />
+      <Stack.Screen name="categories/index" options={{ ...header, title: pick('Категории', 'Categories') }} />
+      <Stack.Screen name="categories/[categoryId]" options={{ ...header, title: '' }} />
+      <Stack.Screen name="sessions" options={{ ...header, title: pick('Сеансы', 'Sessions') }} />
+      <Stack.Screen name="settings" options={{ ...header, title: pick('Настройки', 'Settings') }} />
     </Stack>
   );
 }

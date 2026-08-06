@@ -1,9 +1,10 @@
 import { router, Tabs } from 'expo-router';
+import { BlurView } from 'expo-blur';
 import { Brain, Home, Library, Menu, Plus, Tv } from 'lucide-react-native';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useI18n } from '@/lib/i18n';
-import { useThemeColors } from '@/lib/theme';
+import { useIsDarkTheme, useThemeColors, withAlpha } from '@/lib/theme';
 
 const icons = { index: Home, words: Library, add: Plus, youtube: Tv, study: Brain } as const;
 
@@ -16,12 +17,28 @@ function tabLabel(routeName: string, t: (key: 'home' | 'words' | 'add' | 'study'
 function CustomTabBar({ state, navigation }: { state: { routes: { key: string; name: string }[]; index: number }; navigation: { navigate: (name: string) => void } }) {
   const insets = useSafeAreaInsets();
   const colors = useThemeColors();
+  const isDark = useIsDarkTheme();
   const { t } = useI18n();
   return (
-    <View
-      className="absolute bottom-0 left-0 right-0 flex-row justify-around border-t bg-card border-line px-1 pt-2"
-      style={{ paddingBottom: insets.bottom + 8 }}
-    >
+    // Blur underneath, the app's own colour layered on top: BlurView paints its
+    // own generic tint and would otherwise override any backgroundColor given
+    // to it, leaving the bar grey instead of matching the menu surface.
+    // Styled inline rather than with className — NativeWind only maps classes
+    // onto components it has been taught about, and BlurView is not one.
+    <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, borderTopWidth: 1, borderTopColor: colors.line }}>
+      <BlurView intensity={60} tint={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          paddingHorizontal: 4,
+          paddingTop: 8,
+          // Carries the bar's surface through the home-indicator area, so the
+          // strip below it reads as part of the menu rather than the page.
+          paddingBottom: insets.bottom + 8,
+          backgroundColor: withAlpha(colors.card, isDark ? 0.7 : 0.75),
+        }}
+      >
       {state.routes.map((route, index) => {
         const isFocused = state.index === index;
         const isAdd = route.name === 'add';
@@ -43,6 +60,7 @@ function CustomTabBar({ state, navigation }: { state: { routes: { key: string; n
           </Pressable>
         );
       })}
+      </View>
     </View>
   );
 }
@@ -50,6 +68,7 @@ function CustomTabBar({ state, navigation }: { state: { routes: { key: string; n
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
   const colors = useThemeColors();
+  const isDark = useIsDarkTheme();
   return (
     <View className="flex-1 bg-paper">
       <Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
@@ -59,6 +78,14 @@ export default function TabsLayout() {
         <Tabs.Screen name="youtube" />
         <Tabs.Screen name="study" />
       </Tabs>
+      {/* Content scrolls beneath the status bar; this frosts it rather than
+          hiding it behind a solid block. */}
+      {insets.top > 0 && (
+        <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: insets.top }}>
+          <BlurView intensity={60} tint={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
+          <View style={{ flex: 1, backgroundColor: withAlpha(colors.paper, isDark ? 0.55 : 0.6) }} />
+        </View>
+      )}
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Ещё"
