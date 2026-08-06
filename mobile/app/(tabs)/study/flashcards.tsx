@@ -22,7 +22,7 @@ export default function Flashcards() {
 
   useEffect(() => {
     if (!s.isHydrated) return;
-    let pool = useVocabularyStore.getState().words.filter((w) => w.language === s.selectedStudyLanguage);
+    let pool = useVocabularyStore.getState().words.filter((w) => w.language === s.settings.defaultLanguage);
     if (category) pool = pool.filter((w) => w.categoryId === category);
     if (session) pool = pool.filter((w) => w.sessionId === session);
     setCards((s.settings.shuffle ? shuffle(pool) : pool).slice(0, s.settings.cardsPerSession));
@@ -32,7 +32,7 @@ export default function Flashcards() {
     setHard(0);
     setReady(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [s.isHydrated, s.selectedStudyLanguage, s.settings.cardsPerSession, s.settings.shuffle, category, session]);
+  }, [s.isHydrated, s.settings.defaultLanguage, s.settings.cardsPerSession, s.settings.shuffle, category, session]);
 
   useEffect(() => {
     rotation.value = withTiming(flip ? 180 : 0, { duration: 350 });

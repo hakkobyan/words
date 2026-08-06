@@ -2,17 +2,16 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { Check, Plus, Sparkles } from 'lucide-react-native';
 import { useVocabularyStore } from '@/store/useVocabularyStore';
-import { LanguageSelector, Card, Button, Select } from '@/components/ui/Parts';
+import { Card, Button, Select } from '@/components/ui/Parts';
 import { useI18n } from '@/lib/i18n';
 import { useThemeColors } from '@/lib/theme';
 import { translateWord } from '@/lib/api';
-import { StudyLanguage } from '@/types';
 
 export default function Add() {
   const s = useVocabularyStore();
   const { pick } = useI18n();
   const colors = useThemeColors();
-  const [lang, setLang] = useState<StudyLanguage>(s.selectedStudyLanguage);
+  const lang = s.settings.defaultLanguage;
   const [word, setWord] = useState('');
   const [tr, setTr] = useState('');
   const [cat, setCat] = useState('other');
@@ -24,6 +23,7 @@ export default function Add() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const validSessions = s.sessions.filter((x) => x.language === lang);
+  const activeSession = validSessions.some((x) => x.id === session) ? session : '';
 
   useEffect(() => {
     const clean = word.trim();
@@ -57,7 +57,7 @@ export default function Add() {
       setMsgIsError(true);
       return;
     }
-    const sid = session || validSessions[0]?.id || s.addSession(`${lang === 'english' ? 'Английский' : 'Немецкий'} — ${new Date().toLocaleString('ru')}`, lang);
+    const sid = activeSession || validSessions[0]?.id || s.addSession(`${lang === 'english' ? 'Английский' : 'Немецкий'} — ${new Date().toLocaleString('ru')}`, lang);
     if (s.words.some((w) => w.language === lang && w.word.trim().toLocaleLowerCase() === word.trim().toLocaleLowerCase())) {
       setMsg(pick('Это слово уже добавлено в ваш словарь.', 'This word is already in your dictionary.'));
       setMsgIsError(true);
@@ -94,16 +94,6 @@ export default function Add() {
       <Text className="text-3xl font-black text-ink -mt-2 mb-2">{pick('Новое слово', 'New word')}</Text>
 
       <Card className="p-5 gap-5">
-        <LanguageSelector
-          value={lang}
-          onChange={(l) => {
-            setLang(l);
-            setSession('');
-            setTr('');
-            setSuggestions([]);
-          }}
-        />
-
         <View className="gap-2">
           <Text className="font-bold text-sm text-ink">{lang === 'english' ? pick('Английское слово', 'English word') : pick('Немецкое слово', 'German word')}</Text>
           <View className="relative">
@@ -165,7 +155,7 @@ export default function Add() {
           <View className="gap-2">
             <Text className="font-bold text-sm text-ink">{pick('Сеанс', 'Session')}</Text>
             <Select
-              value={session}
+              value={activeSession}
               onChange={setSession}
               options={[{ value: '', label: pick('Создать автоматически', 'Create automatically') }, ...validSessions.map((v) => ({ value: v.id, label: v.name }))]}
             />

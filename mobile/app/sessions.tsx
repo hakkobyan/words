@@ -3,21 +3,20 @@ import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 import { Plus, Trash2 } from 'lucide-react-native';
 import { useVocabularyStore } from '@/store/useVocabularyStore';
-import { Card, Button, LanguageSelector, Progress } from '@/components/ui/Parts';
+import { Card, Button, Progress } from '@/components/ui/Parts';
 import { useThemeColors } from '@/lib/theme';
 
 export default function Sessions() {
   const s = useVocabularyStore();
   const colors = useThemeColors();
   const [name, setName] = useState('');
-  const [lang, setLang] = useState<'english' | 'german'>('english');
+  const lang = s.settings.defaultLanguage;
 
   return (
     <ScrollView className="flex-1 bg-paper" contentContainerClassName="p-4 gap-4 pb-8">
       <Text className="text-muted">Наборы слов</Text>
       <Text className="text-3xl font-black text-ink -mt-2 mb-2">Сеансы</Text>
       <Card className="p-5 gap-3">
-        <LanguageSelector value={lang} onChange={setLang} />
         <View className="flex-row gap-3">
           <TextInput
             value={name}

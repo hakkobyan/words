@@ -2,7 +2,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Link, router } from 'expo-router';
 import { ArrowRight, BookOpen, Flame, Plus, RotateCcw } from 'lucide-react-native';
 import { useVocabularyStore } from '@/store/useVocabularyStore';
-import { Button, Card, LanguageSelector, Pill, Progress } from '@/components/ui/Parts';
+import { Button, Card, Pill, Progress } from '@/components/ui/Parts';
 import { categoryLabel, useI18n } from '@/lib/i18n';
 import { useThemeColors } from '@/lib/theme';
 
@@ -22,7 +22,7 @@ export default function Home() {
 
   const learned = s.words.filter((w) => w.learned).length;
   const due = s.words.filter(
-    (w) => w.language === s.selectedStudyLanguage && (!w.nextReviewAt || new Date(w.nextReviewAt) <= new Date())
+    (w) => w.language === s.settings.defaultLanguage && (!w.nextReviewAt || new Date(w.nextReviewAt) <= new Date())
   ).length;
   const pct = s.words.length ? Math.round((learned / s.words.length) * 100) : 0;
   const stats = [
@@ -41,7 +41,9 @@ export default function Home() {
         </Text>
       </View>
 
-      <LanguageSelector value={s.selectedStudyLanguage} onChange={s.setLanguage} />
+      <Pressable onPress={() => router.push('/settings')} accessibilityRole="button" className="self-start">
+        <Pill>{s.settings.defaultLanguage === 'english' ? pick('Английский', 'English') : pick('Немецкий', 'German')}</Pill>
+      </Pressable>
 
       <View className="bg-hero-bg rounded-[22px] p-6 gap-3">
         <Text className="text-hero-text text-sm">{pick('ОБЩИЙ ПРОГРЕСС', 'OVERALL PROGRESS')}</Text>

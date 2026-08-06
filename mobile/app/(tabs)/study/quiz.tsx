@@ -22,7 +22,7 @@ export default function Quiz() {
 
   useEffect(() => {
     if (!s.isHydrated) return;
-    const pool = useVocabularyStore.getState().words.filter((w) => w.language === s.selectedStudyLanguage);
+    const pool = useVocabularyStore.getState().words.filter((w) => w.language === s.settings.defaultLanguage);
     if (pool.length >= 4) {
       const questionWords = (s.settings.shuffle ? shuffle(pool) : pool).slice(0, 10);
       setDeck(
@@ -39,11 +39,11 @@ export default function Quiz() {
     setPicked('');
     setReady(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [s.isHydrated, s.selectedStudyLanguage, s.settings.shuffle]);
+  }, [s.isHydrated, s.settings.defaultLanguage, s.settings.shuffle]);
 
   if (!ready) return <View className="flex-1 bg-paper" />;
 
-  if (s.words.filter((w) => w.language === s.selectedStudyLanguage).length < 4) {
+  if (s.words.filter((w) => w.language === s.settings.defaultLanguage).length < 4) {
     return (
       <View className="flex-1 bg-paper items-center justify-center p-6">
         <Card className="p-10 items-center">
