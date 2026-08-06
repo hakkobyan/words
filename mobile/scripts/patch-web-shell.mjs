@@ -17,7 +17,26 @@ const FILE = new URL('../dist/index.html', import.meta.url);
 const PAPER = '#efe5d8';
 const PAPER_DARK = '#1d1714';
 
-const head = `<meta name="theme-color" content="${PAPER}"/><meta name="apple-mobile-web-app-capable" content="yes"/><style id="safe-area-background">html,body{background-color:${PAPER};}html.dark,html.dark body{background-color:${PAPER_DARK};}</style>`;
+// The shell is an app frame: the document itself never scrolls, an inner view
+// does. Left alone, dragging past the end of that view bounces the whole page
+// and exposes the blank area around it, and taps carry the browser's 300ms
+// double-tap delay.
+const css = [
+  `html,body{background-color:${PAPER};}`,
+  `html.dark,html.dark body{background-color:${PAPER_DARK};}`,
+  `html,body{overscroll-behavior:none;}`,
+  `body{-webkit-tap-highlight-color:transparent;touch-action:manipulation;}`,
+  // Keeps a scrolled-to-the-end list from handing the gesture to the page.
+  `div{overscroll-behavior-y:contain;}`,
+  // react-native-safe-area-context reports zeroes in the browser, which would
+  // leave the menu short of the bottom edge and no strip under the status bar.
+  // These take the real values straight from the viewport; the elements are
+  // tagged with dataSet in (tabs)/_layout.tsx.
+  `[data-safe-top]{height:env(safe-area-inset-top)!important;}`,
+  `[data-safe-bottom]{padding-bottom:calc(8px + env(safe-area-inset-bottom))!important;}`,
+].join('');
+
+const head = `<meta name="theme-color" content="${PAPER}"/><meta name="apple-mobile-web-app-capable" content="yes"/><style id="safe-area-background">${css}</style>`;
 
 const html = await readFile(FILE, 'utf8');
 
