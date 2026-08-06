@@ -1,4 +1,4 @@
-import {CEFR_LEVELS,CefrLevel,StudyLanguage} from '@/types';
+import {CEFR_LEVELS,CefrLevel,StudyLanguage} from './types';
 
 export type TranscriptCue={text:string;startSeconds:number};
 export type VideoVocabularyItem={id:string;word:string;pronunciation:string;partOfSpeech:string;level:CefrLevel;translationRu:string;explanation:string;example:string;exampleTranslationRu:string;synonyms:string[];antonyms?:string[];categoryId:string;timestampSeconds:number};

@@ -1,4 +1,4 @@
-import {NextResponse} from 'next/server';
+import type {VercelRequest,VercelResponse} from '@vercel/node';
 
 type RequestBody={text?:string;sourceLanguage?:'english'|'german'};
 type DeepLResponse={translations?:Array<{text:string}>};
@@ -29,33 +29,34 @@ function uniqueSuggestions(values:string[]){
   return result.slice(0,5);
 }
 
-export async function POST(request:Request){
+export default async function handler(req:VercelRequest,res:VercelResponse){
+  if(req.method!=='POST')return res.status(405).json({error:'Метод не поддерживается.'});
   try{
-    const {text,sourceLanguage}=await request.json() as RequestBody;
+    const {text,sourceLanguage}=(req.body||{}) as RequestBody;
     const clean=text?.trim();
-    if(!clean||!sourceLanguage)return NextResponse.json({error:'Укажите слово и язык.'},{status:400});
-    if(clean.length>200)return NextResponse.json({error:'Слишком длинный текст.'},{status:400});
+    if(!clean||!sourceLanguage)return res.status(400).json({error:'Укажите слово и язык.'});
+    if(clean.length>200)return res.status(400).json({error:'Слишком длинный текст.'});
 
     const cacheKey=`v2:${sourceLanguage}:${clean.toLocaleLowerCase()}`;
     const cached=cache.get(cacheKey);
-    if(cached&&cached.expiresAt>Date.now())return NextResponse.json({suggestions:cached.suggestions});
+    if(cached&&cached.expiresAt>Date.now())return res.status(200).json({suggestions:cached.suggestions});
 
     const key=process.env.DEEPL_API_KEY;
-    if(!key)return NextResponse.json({error:'Переводчик пока не настроен.'},{status:503});
+    if(!key)return res.status(503).json({error:'Переводчик пока не настроен.'});
     const base=(process.env.DEEPL_API_URL||(key.endsWith(':fx')?'https://api-free.deepl.com':'https://api.deepl.com')).replace(/\/$/,'');
     const sourceLang=sourceLanguage==='english'?'EN':'DE';
     const responses=await Promise.all(contextsFor(clean,sourceLanguage).map(context=>fetch(`${base}/v2/translate`,{
       method:'POST',headers:{Authorization:`DeepL-Auth-Key ${key}`,'Content-Type':'application/json'},
-      body:JSON.stringify({text:[clean],source_lang:sourceLang,target_lang:'RU',context}),cache:'no-store',
+      body:JSON.stringify({text:[clean],source_lang:sourceLang,target_lang:'RU',context}),
     })));
-    if(responses.some(response=>response.status===403))return NextResponse.json({error:'Ключ DeepL недействителен.'},{status:403});
+    if(responses.some(response=>response.status===403))return res.status(403).json({error:'Ключ DeepL недействителен.'});
 
     const payloads=await Promise.all(responses.map(async response=>response.ok?await response.json() as DeepLResponse:null));
     const suggestions=uniqueSuggestions(payloads.flatMap(data=>data?.translations?.map(item=>item.text)??[]));
-    if(!suggestions.length)return NextResponse.json({error:'Не удалось получить перевод.'},{status:502});
+    if(!suggestions.length)return res.status(502).json({error:'Не удалось получить перевод.'});
 
     if(cache.size>=500)cache.delete(cache.keys().next().value as string);
     cache.set(cacheKey,{expiresAt:Date.now()+CACHE_TTL,suggestions});
-    return NextResponse.json({suggestions});
-  }catch{return NextResponse.json({error:'Ошибка сервиса перевода.'},{status:500})}
+    return res.status(200).json({suggestions});
+  }catch{return res.status(500).json({error:'Ошибка сервиса перевода.'})}
 }

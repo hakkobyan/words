@@ -1,13 +1,13 @@
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {ProxyAgent,fetch as undiciFetch} from 'undici';
-import {NextResponse} from 'next/server';
-import {curateTranscript,parseYoutubeUrl,TranscriptCue,VideoVocabularyItem} from '@/lib/youtube-vocabulary';
-import {StudyLanguage} from '@/types';
+import type {VercelRequest,VercelResponse} from '@vercel/node';
+import {curateTranscript,parseYoutubeUrl,TranscriptCue,VideoVocabularyItem} from './_lib/youtube-vocabulary';
+import {StudyLanguage} from './_lib/types';
 import englishDictionaryWords from 'an-array-of-english-words';
 import germanDictionaryWords from 'an-array-of-german-words';
-import englishFrequency from '@/data/frequency/en.json';
-import germanFrequency from '@/data/frequency/de.json';
+import englishFrequency from './_data/en.json';
+import germanFrequency from './_data/de.json';
 
 type CaptionTrack={baseUrl:string;languageCode:string;kind?:string};
 type PlayerResponse={videoDetails?:{title?:string;lengthSeconds?:string;videoId?:string};playabilityStatus?:{status?:string;reason?:string};captions?:{playerCaptionsTracklistRenderer?:{captionTracks?:CaptionTrack[]}}};
@@ -19,8 +19,6 @@ type YtDlpInfo={title?:string;duration?:number;subtitles?:Record<string,YtDlpSub
 type FallbackCandidate={word:string;count:number;example:string;timestampSeconds:number};
 
 class YouTubeVocabularyError extends Error{constructor(public code:string){super(code)}}
-
-export const runtime='nodejs';
 
 const execFileAsync=promisify(execFile);
 const cleanCaptionText=(value:string)=>value.replace(/<[^>]+>/g,' ').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/\s+/g,' ').trim();
@@ -305,9 +303,10 @@ async function translateExamples(items:VideoVocabularyItem[],language:StudyLangu
   }catch{return items}
 }
 
-export async function POST(request:Request){
+export default async function handler(req:VercelRequest,res:VercelResponse){
+  if(req.method!=='POST')return res.status(405).json({error:'METHOD_NOT_ALLOWED'});
   try{
-    const body=await request.json() as {url?:string;language?:StudyLanguage};
+    const body=(req.body||{}) as {url?:string;language?:StudyLanguage};
     const source=body.url?parseYoutubeUrl(body.url):null;
     if(!source)throw new YouTubeVocabularyError('INVALID_URL');
     if(body.language!=='english'&&body.language!=='german')throw new YouTubeVocabularyError('UNSUPPORTED_LANGUAGE');
@@ -332,7 +331,7 @@ export async function POST(request:Request){
     const vocabulary=await translateExamples(deduped,body.language);
     if(!vocabulary.length)throw new YouTubeVocabularyError('NO_USEFUL_VOCABULARY');
 
-    return NextResponse.json({
+    return res.status(200).json({
       video:{
         id:source.id,
         title:player.videoDetails?.title||'YouTube video',
@@ -347,6 +346,6 @@ export async function POST(request:Request){
   }catch(error){
     const code=error instanceof YouTubeVocabularyError?error.code:'NETWORK_ERROR';
     const status=code==='INVALID_URL'?400:code==='NO_SUBTITLES'||code==='UNSUPPORTED_LANGUAGE'||code==='NO_USEFUL_VOCABULARY'?422:code==='TIMEOUT'?504:code==='CAPTION_FETCH_BLOCKED'?503:502;
-    return NextResponse.json({error:code},{status});
+    return res.status(status).json({error:code});
   }
 }

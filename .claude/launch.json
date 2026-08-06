@@ -2,17 +2,27 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "words-dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 3000
-    },
-    {
       "name": "words-expo-native",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "start"],
+      "runtimeArgs": [
+        "run",
+        "start"
+      ],
       "cwd": "mobile",
       "port": 8081
+    },
+    {
+      "name": "words-static",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--yes",
+        "serve",
+        "-s",
+        "mobile/dist",
+        "-l",
+        "4000"
+      ],
+      "port": 4000
     }
   ]
 }
