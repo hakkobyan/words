@@ -3,6 +3,8 @@ import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 
 import { Check, Plus, Sparkles } from 'lucide-react-native';
 import { useVocabularyStore } from '@/store/useVocabularyStore';
 import { Card, Button, Select } from '@/components/ui/Parts';
+import { useScreenPadding } from '@/lib/insets';
+import { dataSet } from '@/lib/web';
 import { useI18n } from '@/lib/i18n';
 import { useThemeColors } from '@/lib/theme';
 import { translateWord } from '@/lib/api';
@@ -10,6 +12,7 @@ import { translateWord } from '@/lib/api';
 export default function Add() {
   const s = useVocabularyStore();
   const { pick } = useI18n();
+  const screenPadding = useScreenPadding();
   const colors = useThemeColors();
   const lang = s.settings.defaultLanguage;
   const [word, setWord] = useState('');
@@ -89,7 +92,7 @@ export default function Add() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-paper" contentContainerClassName="p-4 gap-4 pb-8">
+    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="p-4 gap-4 pb-8">
       <Text className="text-muted">{pick('Перевод с помощью DeepL', 'Translation powered by DeepL')}</Text>
       <Text className="text-3xl font-black text-ink -mt-2 mb-2">{pick('Новое слово', 'New word')}</Text>
 

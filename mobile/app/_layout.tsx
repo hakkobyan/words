@@ -6,6 +6,7 @@ import { colorScheme } from 'nativewind';
 import { useVocabularyStore } from '@/store/useVocabularyStore';
 import { useThemeColors } from '@/lib/theme';
 import { useI18n } from '@/lib/i18n';
+import { RealInsetsProvider } from '@/lib/insets';
 import { dailySession } from '@/lib/dailyWords';
 import Onboarding from '@/components/onboarding/Onboarding';
 import DailyWords from '@/components/daily/DailyWords';
@@ -53,6 +54,7 @@ export default function RootLayout() {
   };
 
   return (
+    <RealInsetsProvider>
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.paper } }}>
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="categories/index" options={{ ...header, title: pick('Категории', 'Categories') }} />
@@ -60,5 +62,6 @@ export default function RootLayout() {
       <Stack.Screen name="sessions" options={{ ...header, title: pick('Сеансы', 'Sessions') }} />
       <Stack.Screen name="settings" options={{ ...header, title: pick('Настройки', 'Settings') }} />
     </Stack>
+    </RealInsetsProvider>
   );
 }
