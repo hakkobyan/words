@@ -116,8 +116,6 @@ export function parseYoutubeUrl(value:string){
   }catch{return null}
 }
 
-export function formatDuration(seconds:number){const minutes=Math.floor(seconds/60),remaining=seconds%60;return `${minutes}:${String(remaining).padStart(2,'0')}`}
-export function nextCefrLevel(level:CefrLevel){return CEFR_LEVELS[Math.min(CEFR_RANK[level]+1,CEFR_LEVELS.length-1)]}
 
 export function curateTranscript(cues:TranscriptCue[],language:StudyLanguage){
   const catalog=language==='english'?englishCatalog:germanCatalog;
