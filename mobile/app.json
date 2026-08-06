@@ -25,9 +25,6 @@
     },
     "plugins": [
       "expo-router"
-    ],
-    "extra": {
-      "apiBaseUrl": "https://YOUR-VERCEL-DEPLOYMENT.vercel.app"
-    }
+    ]
   }
 }

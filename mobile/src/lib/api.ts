@@ -1,8 +1,11 @@
-import Constants from 'expo-constants';
 import {StudyLanguage} from '@/types';
 import {VideoAnalysis} from '@/lib/youtube-vocabulary';
 
-const API_BASE_URL=((Constants.expoConfig?.extra?.apiBaseUrl as string|undefined)??'').replace(/\/$/,'');
+// Production backend, deployed from the same repo's root Next.js app.
+// Override locally by setting EXPO_PUBLIC_API_BASE_URL in mobile/.env
+// (e.g. to point at a local `npm run dev` server instead).
+const DEFAULT_API_BASE_URL='https://words-ten-lemon.vercel.app';
+const API_BASE_URL=(process.env.EXPO_PUBLIC_API_BASE_URL??DEFAULT_API_BASE_URL).replace(/\/$/,'');
 
 export async function translateWord(text:string,sourceLanguage:StudyLanguage,signal?:AbortSignal){
   const response=await fetch(`${API_BASE_URL}/api/translate`,{
