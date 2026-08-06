@@ -5,7 +5,7 @@ import {categories as defaults} from '@/data/defaults';
 import {read,write} from '@/lib/storage';
 import {Category,Settings,StudyLanguage,UserWord,VocabularySession} from '@/types';
 
-const baseSettings:Settings={theme:'system',interfaceLanguage:'ru',defaultLanguage:'english',learnerLevel:'B1',cardsPerSession:10,showExamples:true,shuffle:true,reverse:true,autoCategory:true};
+const baseSettings:Settings={theme:'system',interfaceLanguage:'ru',defaultLanguage:'english',learnerLevel:'B1',cardsPerSession:10,showExamples:true,shuffle:true,reverse:true,autoCategory:true,onboardingCompleted:false};
 type NewWord=Omit<UserWord,'id'|'createdAt'|'updatedAt'>;
 type Store={
   words:UserWord[];categories:Category[];sessions:VocabularySession[];settings:Settings;selectedStudyLanguage:StudyLanguage;isHydrated:boolean;
