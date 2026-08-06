@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useI18n } from '@/lib/i18n';
 import { useIsDarkTheme, useThemeColors, withAlpha } from '@/lib/theme';
+import { dataSet } from '@/lib/web';
 
 const icons = { index: Home, words: Library, add: Plus, youtube: Tv, study: Brain } as const;
 
@@ -28,6 +29,9 @@ function CustomTabBar({ state, navigation }: { state: { routes: { key: string; n
     <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, borderTopWidth: 1, borderTopColor: colors.line }}>
       <BlurView intensity={60} tint={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
       <View
+        // data-safe-bottom lets the stylesheet supply the real inset on web,
+        // where the safe-area library reports zero.
+        {...dataSet({ safeBottom: 'true' })}
         style={{
           flexDirection: 'row',
           justifyContent: 'space-around',
@@ -80,12 +84,16 @@ export default function TabsLayout() {
       </Tabs>
       {/* Content scrolls beneath the status bar; this frosts it rather than
           hiding it behind a solid block. */}
-      {insets.top > 0 && (
-        <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: insets.top }}>
-          <BlurView intensity={60} tint={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
-          <View style={{ flex: 1, backgroundColor: withAlpha(colors.paper, isDark ? 0.55 : 0.6) }} />
-        </View>
-      )}
+      {/* Rendered even when the inset reads zero: on web the stylesheet gives it
+          the real height, and a zero-height strip is simply invisible. */}
+      <View
+        pointerEvents="none"
+        {...dataSet({ safeTop: 'true' })}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: insets.top }}
+      >
+        <BlurView intensity={60} tint={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
+        <View style={{ flex: 1, backgroundColor: withAlpha(colors.paper, isDark ? 0.55 : 0.6) }} />
+      </View>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Ещё"
