@@ -1,4 +1,5 @@
 import type {VercelRequest,VercelResponse} from '@vercel/node';
+import {applyCors} from './_lib/http';
 
 type RequestBody={text?:string;sourceLanguage?:'english'|'german'};
 type DeepLResponse={translations?:Array<{text:string}>};
@@ -30,6 +31,7 @@ function uniqueSuggestions(values:string[]){
 }
 
 export default async function handler(req:VercelRequest,res:VercelResponse){
+  if(applyCors(req,res))return;
   if(req.method!=='POST')return res.status(405).json({error:'Метод не поддерживается.'});
   try{
     const {text,sourceLanguage}=(req.body||{}) as RequestBody;

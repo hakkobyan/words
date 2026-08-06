@@ -2,6 +2,7 @@ import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {ProxyAgent,fetch as undiciFetch} from 'undici';
 import type {VercelRequest,VercelResponse} from '@vercel/node';
+import {applyCors} from './_lib/http';
 import {curateTranscript,parseYoutubeUrl,TranscriptCue,VideoVocabularyItem} from './_lib/youtube-vocabulary';
 import {StudyLanguage} from './_lib/types';
 import englishDictionaryWords from 'an-array-of-english-words';
@@ -304,6 +305,7 @@ async function translateExamples(items:VideoVocabularyItem[],language:StudyLangu
 }
 
 export default async function handler(req:VercelRequest,res:VercelResponse){
+  if(applyCors(req,res))return;
   if(req.method!=='POST')return res.status(405).json({error:'METHOD_NOT_ALLOWED'});
   try{
     const body=(req.body||{}) as {url?:string;language?:StudyLanguage};
