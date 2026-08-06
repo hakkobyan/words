@@ -2,7 +2,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { ArrowRight, Flame, HelpCircle, Layers } from 'lucide-react-native';
 import { useVocabularyStore } from '@/store/useVocabularyStore';
-import { Card, LanguageSelector } from '@/components/ui/Parts';
+import { Card } from '@/components/ui/Parts';
 import { useI18n } from '@/lib/i18n';
 import { useThemeColors } from '@/lib/theme';
 
@@ -10,9 +10,9 @@ export default function Study() {
   const s = useVocabularyStore();
   const { pick } = useI18n();
   const colors = useThemeColors();
-  const languageWords = s.words.filter((w) => w.language === s.selectedStudyLanguage);
+  const languageWords = s.words.filter((w) => w.language === s.settings.defaultLanguage);
   const due = languageWords.filter((w) => !w.nextReviewAt || new Date(w.nextReviewAt) <= new Date()).length;
-  const languageName = s.selectedStudyLanguage === 'english' ? pick('английских', 'English') : pick('немецких', 'German');
+  const languageName = s.settings.defaultLanguage === 'english' ? pick('английских', 'English') : pick('немецких', 'German');
 
   const modes = [
     [Layers, pick('Флеш-карточки', 'Flashcards'), pick('Переворачивайте карточки и оценивайте знание', 'Flip cards and rate your knowledge'), '/study/flashcards'],
@@ -26,7 +26,6 @@ export default function Study() {
           <Text className="text-muted">{pick('Выберите формат', 'Choose a mode')}</Text>
           <Text className="text-3xl font-black text-ink">{pick('Тренировка', 'Study')}</Text>
         </View>
-        <LanguageSelector value={s.selectedStudyLanguage} onChange={s.setLanguage} />
       </View>
 
       <Card className="p-5 flex-row items-center gap-4">
@@ -37,7 +36,7 @@ export default function Study() {
           <Text className="font-bold text-ink">
             {due} {languageName} {pick('слов на повторение', 'words to review')}
           </Text>
-          <Text className="text-muted text-sm">{pick('В тренировку попадут только слова выбранного языка', 'Only words in the selected language will be included')}</Text>
+          <Text className="text-muted text-sm">{pick('Язык обучения меняется в настройках', 'Change the learning language in settings')}</Text>
         </View>
       </Card>
 

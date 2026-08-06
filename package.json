@@ -1,1 +1,19 @@
-{"name":"words","version":"1.0.0","private":true,"scripts":{"dev":"next dev","build":"next build","start":"next start","lint":"eslint ."},"dependencies":{"@tailwindcss/postcss":"latest","an-array-of-english-words":"^2.0.0","an-array-of-german-words":"^1.2.0","framer-motion":"latest","lucide-react":"latest","next":"latest","react":"latest","react-dom":"latest","tailwindcss":"latest","undici":"^8.10.0","youtubei.js":"^17.2.0","zustand":"latest"},"devDependencies":{"@types/node":"latest","@types/react":"latest","@types/react-dom":"latest","eslint":"latest","eslint-config-next":"latest","typescript":"latest"}}
+{
+  "name": "words",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix mobile install --legacy-peer-deps && npm --prefix mobile run build:web",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "an-array-of-english-words": "^2.0.0",
+    "an-array-of-german-words": "^1.2.0",
+    "undici": "^8.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@vercel/node": "^5.3.24",
+    "typescript": "~5.9.2"
+  }
+}

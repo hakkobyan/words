@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Alert, ScrollView, Switch, Text, View } from 'react-native';
 import { Download, RotateCcw, Trash2, Upload } from 'lucide-react-native';
 import * as Sharing from 'expo-sharing';
+import * as DocumentPicker from 'expo-document-picker';
 import { File, Paths } from 'expo-file-system';
 import Slider from '@react-native-community/slider';
 import { useVocabularyStore } from '@/store/useVocabularyStore';
@@ -9,7 +10,7 @@ import { backupPayload } from '@/lib/storage';
 import { Card, Button, Select } from '@/components/ui/Parts';
 import { useI18n } from '@/lib/i18n';
 import { useThemeColors } from '@/lib/theme';
-import { CEFR_LEVELS, CefrLevel } from '@/types';
+import { CEFR_LEVELS, CefrLevel, StudyLanguage } from '@/types';
 
 export default function Settings() {
   const store = useVocabularyStore();
@@ -41,9 +42,9 @@ export default function Settings() {
 
   const importData = async () => {
     try {
-      const result = await File.pickFileAsync({ mimeTypes: ['application/json'] });
+      const result = await DocumentPicker.getDocumentAsync({ type: 'application/json', copyToCacheDirectory: true });
       if (result.canceled) return;
-      const data = JSON.parse(await result.result.text());
+      const data = JSON.parse(await new File(result.assets[0].uri).text());
       if (!Array.isArray(data.words) || !Array.isArray(data.categories) || !Array.isArray(data.sessions)) throw new Error('INVALID_BACKUP');
       store.replaceData(data);
       setMessage(pick(`Импортировано ${data.words.length} слов`, `Imported ${data.words.length} words`));
@@ -108,6 +109,20 @@ export default function Settings() {
 
       <Card className="p-5 gap-5">
         <Text className="font-bold text-lg text-ink">{pick('Обучение', 'Learning')}</Text>
+        <View className="gap-2">
+          <Text className="font-bold text-sm text-ink">{pick('Язык обучения', 'Learning language')}</Text>
+          <Select
+            value={store.settings.defaultLanguage}
+            onChange={(v: StudyLanguage) => store.setSettings({ defaultLanguage: v })}
+            options={[
+              { value: 'english' as StudyLanguage, label: pick('Английский', 'English') },
+              { value: 'german' as StudyLanguage, label: pick('Немецкий', 'German') },
+            ]}
+          />
+          <Text className="text-muted text-xs">
+            {pick('Слова, тренировки и YouTube используют этот язык.', 'Words, study sessions and YouTube use this language.')}
+          </Text>
+        </View>
         <View className="gap-2">
           <Text className="font-bold text-sm text-ink">{pick('Ваш текущий уровень', 'Your current level')}</Text>
           <Select
