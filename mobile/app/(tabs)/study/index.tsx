@@ -1,0 +1,63 @@
+import { Pressable, ScrollView, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { ArrowRight, Flame, HelpCircle, Layers } from 'lucide-react-native';
+import { useVocabularyStore } from '@/store/useVocabularyStore';
+import { Card, LanguageSelector } from '@/components/ui/Parts';
+import { useI18n } from '@/lib/i18n';
+import { useThemeColors } from '@/lib/theme';
+
+export default function Study() {
+  const s = useVocabularyStore();
+  const { pick } = useI18n();
+  const colors = useThemeColors();
+  const languageWords = s.words.filter((w) => w.language === s.selectedStudyLanguage);
+  const due = languageWords.filter((w) => !w.nextReviewAt || new Date(w.nextReviewAt) <= new Date()).length;
+  const languageName = s.selectedStudyLanguage === 'english' ? pick('английских', 'English') : pick('немецких', 'German');
+
+  const modes = [
+    [Layers, pick('Флеш-карточки', 'Flashcards'), pick('Переворачивайте карточки и оценивайте знание', 'Flip cards and rate your knowledge'), '/study/flashcards'],
+    [HelpCircle, pick('Квиз', 'Quiz'), pick('Выберите правильный перевод из четырёх вариантов', 'Choose the correct translation from four options'), '/study/quiz'],
+  ] as const;
+
+  return (
+    <ScrollView className="flex-1 bg-paper" contentContainerClassName="p-4 gap-4 pb-8">
+      <View className="gap-4">
+        <View>
+          <Text className="text-muted">{pick('Выберите формат', 'Choose a mode')}</Text>
+          <Text className="text-3xl font-black text-ink">{pick('Тренировка', 'Study')}</Text>
+        </View>
+        <LanguageSelector value={s.selectedStudyLanguage} onChange={s.setLanguage} />
+      </View>
+
+      <Card className="p-5 flex-row items-center gap-4">
+        <View className="bg-mint p-4 rounded-2xl">
+          <Flame color={colors.green} />
+        </View>
+        <View className="flex-1">
+          <Text className="font-bold text-ink">
+            {due} {languageName} {pick('слов на повторение', 'words to review')}
+          </Text>
+          <Text className="text-muted text-sm">{pick('В тренировку попадут только слова выбранного языка', 'Only words in the selected language will be included')}</Text>
+        </View>
+      </Card>
+
+      <View className="gap-4">
+        {modes.map(([Icon, title, text, href]) => (
+          <Pressable key={title} onPress={() => router.push(href)}>
+            <Card className="p-6">
+              <View className="bg-mint self-start p-4 rounded-2xl">
+                <Icon size={28} color={colors.green} />
+              </View>
+              <Text className="font-bold text-xl text-ink mt-5">{title}</Text>
+              <Text className="text-muted mt-2 mb-5">{text}</Text>
+              <View className="flex-row items-center gap-2">
+                <Text className="font-bold text-green">{pick('Начать', 'Start')}</Text>
+                <ArrowRight size={18} color={colors.green} />
+              </View>
+            </Card>
+          </Pressable>
+        ))}
+      </View>
+    </ScrollView>
+  );
+}
