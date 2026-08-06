@@ -5,10 +5,10 @@ export default function Flashcards(){
   const [i,setI]=useState(0),[flip,setFlip]=useState(false),[known,setKnown]=useState(0),[hard,setHard]=useState(0);
   useEffect(()=>{
     if(!s.isHydrated)return;
-    const pool=useVocabularyStore.getState().words.filter(w=>w.language===s.selectedStudyLanguage);
+    const pool=useVocabularyStore.getState().words.filter(w=>w.language===s.settings.defaultLanguage);
     setCards((s.settings.shuffle?shuffle(pool):pool).slice(0,s.settings.cardsPerSession));
     setI(0);setFlip(false);setKnown(0);setHard(0);setReady(true);
-  },[s.isHydrated,s.selectedStudyLanguage,s.settings.cardsPerSession,s.settings.shuffle]);
+  },[s.isHydrated,s.settings.defaultLanguage,s.settings.cardsPerSession,s.settings.shuffle]);
   if(!ready)return null;
   if(!cards.length)return <div className="card p-10 text-center"><h1 className="text-2xl font-bold">Пока нечего учить</h1><p className="muted mt-2 mb-5">Сначала добавьте несколько слов выбранного языка</p><Link href="/add" className="btn primary">Добавить слова</Link></div>;
   if(i>=cards.length)return <div className="card p-8 text-center max-w-xl mx-auto"><div className="text-5xl mb-4">🎉</div><h1 className="text-3xl font-black">Тренировка завершена</h1><p className="muted mt-2">Вы повторили {cards.length} слов</p><div className="grid grid-cols-3 gap-3 my-7"><div><b className="text-2xl">{known}</b><p className="muted text-xs">Знаю</p></div><div><b className="text-2xl">{hard}</b><p className="muted text-xs">Сложно</p></div><div><b className="text-2xl">{cards.length-known-hard}</b><p className="muted text-xs">Не знаю</p></div></div><Link href="/" className="btn primary">На главную</Link></div>;

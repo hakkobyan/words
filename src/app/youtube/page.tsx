@@ -38,7 +38,7 @@ export default function YouTubeVocabulary(){
   const [ignoredIds,setIgnoredIds]=useState<string[]>([]);
   const [videoSessionId,setVideoSessionId]=useState('');
   const [notice,setNotice]=useState('');
-  const language=store.selectedStudyLanguage;
+  const language=store.settings.defaultLanguage;
   const knownByWord=useMemo(()=>new Map(store.words.filter(word=>word.language===language).map(word=>[wordKey(word.word),word])),[store.words,language]);
 
   useEffect(()=>{
