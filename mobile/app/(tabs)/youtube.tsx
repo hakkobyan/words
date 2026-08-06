@@ -9,6 +9,8 @@ import { useVocabularyStore } from '@/store/useVocabularyStore';
 import { analyzeYoutubeVideo } from '@/lib/api';
 import { Card, Button, Select } from '@/components/ui/Parts';
 import { useThemeColors } from '@/lib/theme';
+import { useScreenPadding } from '@/lib/insets';
+import { dataSet } from '@/lib/web';
 
 const loadingSteps = ['Downloading subtitles…', 'Detecting language…', 'Finding useful vocabulary…', 'Translating words…', 'Preparing lesson…'];
 const errors: Record<string, { title: string; text: string }> = {
@@ -48,6 +50,7 @@ function FilterChip({ label, checked, onToggle }: { label: string; checked: bool
 
 export default function YouTubeVocabulary() {
   const store = useVocabularyStore();
+  const screenPadding = useScreenPadding();
   const colors = useThemeColors();
   const [url, setUrl] = useState('');
   const [analysis, setAnalysis] = useState<VideoAnalysis | null>(null);
@@ -169,7 +172,7 @@ export default function YouTubeVocabulary() {
   const activeError = errors[errorCode] || errors.NETWORK_ERROR;
 
   return (
-    <ScrollView className="flex-1 bg-paper" contentContainerClassName="p-4 gap-7 pb-8">
+    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="p-4 gap-7 pb-8">
       <View>
         <Text className="text-muted text-sm mb-1">Learn from real content</Text>
         <Text className="text-3xl font-black text-ink tracking-tight">YouTube Vocabulary</Text>

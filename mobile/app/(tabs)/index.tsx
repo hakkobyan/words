@@ -5,10 +5,13 @@ import { useVocabularyStore } from '@/store/useVocabularyStore';
 import { Button, Card, Pill, Progress } from '@/components/ui/Parts';
 import { categoryLabel, useI18n } from '@/lib/i18n';
 import { useThemeColors } from '@/lib/theme';
+import { useScreenPadding } from '@/lib/insets';
+import { dataSet } from '@/lib/web';
 
 export default function Home() {
   const s = useVocabularyStore();
   const { pick, locale } = useI18n();
+  const screenPadding = useScreenPadding();
   const colors = useThemeColors();
 
   if (!s.isHydrated) {
@@ -33,7 +36,7 @@ export default function Home() {
   ] as const;
 
   return (
-    <ScrollView className="flex-1 bg-paper" contentContainerClassName="p-4 gap-7 pb-8">
+    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="p-4 gap-7 pb-8">
       <View>
         <Text className="text-muted text-sm mb-1">{pick('Ваш словарь', 'Your vocabulary')}</Text>
         <Text className="text-3xl font-black text-ink tracking-tight">

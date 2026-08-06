@@ -3,12 +3,15 @@ import { router } from 'expo-router';
 import { ArrowRight, Flame, HelpCircle, Layers } from 'lucide-react-native';
 import { useVocabularyStore } from '@/store/useVocabularyStore';
 import { Card } from '@/components/ui/Parts';
+import { useScreenPadding } from '@/lib/insets';
+import { dataSet } from '@/lib/web';
 import { useI18n } from '@/lib/i18n';
 import { useThemeColors } from '@/lib/theme';
 
 export default function Study() {
   const s = useVocabularyStore();
   const { pick } = useI18n();
+  const screenPadding = useScreenPadding();
   const colors = useThemeColors();
   const languageWords = s.words.filter((w) => w.language === s.settings.defaultLanguage);
   const due = languageWords.filter((w) => !w.nextReviewAt || new Date(w.nextReviewAt) <= new Date()).length;
@@ -20,7 +23,7 @@ export default function Study() {
   ] as const;
 
   return (
-    <ScrollView className="flex-1 bg-paper" contentContainerClassName="p-4 gap-4 pb-8">
+    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="p-4 gap-4 pb-8">
       <View className="gap-4">
         <View>
           <Text className="text-muted">{pick('Выберите формат', 'Choose a mode')}</Text>

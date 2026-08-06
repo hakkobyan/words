@@ -5,6 +5,8 @@ import { useVocabularyStore } from '@/store/useVocabularyStore';
 import { Card, Empty, Pill, Select, SearchBox } from '@/components/ui/Parts';
 import { categoryLabel, useI18n } from '@/lib/i18n';
 import { useThemeColors } from '@/lib/theme';
+import { useScreenPadding } from '@/lib/insets';
+import { dataSet } from '@/lib/web';
 
 type LangFilter = 'all' | 'english' | 'german';
 type SortOrder = 'new' | 'old' | 'alpha' | 'mistakes';
@@ -12,6 +14,7 @@ type SortOrder = 'new' | 'old' | 'alpha' | 'mistakes';
 export default function Words() {
   const s = useVocabularyStore();
   const { pick, locale } = useI18n();
+  const screenPadding = useScreenPadding();
   const colors = useThemeColors();
   const [q, setQ] = useState('');
   const [lang, setLang] = useState<LangFilter>('all');
@@ -35,6 +38,8 @@ export default function Words() {
       <FlatList
         data={ws}
         keyExtractor={(w) => w.id}
+        {...dataSet({ screenPad: 'true' })}
+        contentContainerStyle={screenPadding}
         contentContainerClassName="p-4 gap-3 pb-8"
         ListHeaderComponent={
           <View className="gap-3 mb-3">
