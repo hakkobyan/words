@@ -1,10 +1,10 @@
 import '../global.css';
 import { useEffect, useSyncExternalStore } from 'react';
-import { Platform, useColorScheme } from 'react-native';
+import { Platform, StatusBar, useColorScheme } from 'react-native';
 import { Stack } from 'expo-router';
 import { colorScheme } from 'nativewind';
 import { useVocabularyStore } from '@/store/useVocabularyStore';
-import { useThemeColors } from '@/lib/theme';
+import { useIsDarkTheme, useThemeColors } from '@/lib/theme';
 import { useI18n } from '@/lib/i18n';
 import { RealInsetsProvider } from '@/lib/insets';
 import { dailySession } from '@/lib/dailyWords';
@@ -19,6 +19,7 @@ export default function RootLayout() {
   const dailyDone = useSyncExternalStore(dailySession.subscribe, dailySession.isHandled, dailySession.isHandled);
   const systemScheme = useColorScheme();
   const colors = useThemeColors();
+  const isDark = useIsDarkTheme();
   const { pick } = useI18n();
 
   useEffect(() => {
@@ -55,14 +56,19 @@ export default function RootLayout() {
 
   return (
     <RealInsetsProvider>
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.paper } }}>
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="categories/index" options={{ ...header, title: pick('Категории', 'Categories') }} />
-      <Stack.Screen name="categories/[categoryId]" options={{ ...header, title: '' }} />
-      <Stack.Screen name="sessions" options={{ ...header, title: pick('Сеансы', 'Sessions') }} />
-      <Stack.Screen name="settings" options={{ ...header, title: pick('Настройки', 'Settings') }} />
-      <Stack.Screen name="explore" options={{ headerShown: false }} />
-    </Stack>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+      />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.paper } }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="categories/index" options={{ ...header, title: pick('Категории', 'Categories') }} />
+        <Stack.Screen name="categories/[categoryId]" options={{ ...header, title: '' }} />
+        <Stack.Screen name="sessions" options={{ ...header, title: pick('Сеансы', 'Sessions') }} />
+        <Stack.Screen name="settings" options={{ ...header, title: pick('Настройки', 'Settings') }} />
+        <Stack.Screen name="explore" options={{ headerShown: false }} />
+      </Stack>
     </RealInsetsProvider>
   );
 }
