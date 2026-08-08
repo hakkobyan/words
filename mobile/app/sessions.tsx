@@ -13,7 +13,7 @@ export default function Sessions() {
   const lang = s.settings.defaultLanguage;
 
   return (
-    <ScrollView className="flex-1 bg-paper" contentContainerClassName="p-4 gap-4 pb-8">
+    <ScrollView className="flex-1 bg-paper" contentContainerClassName="w-full max-w-[720px] self-center px-5 py-6 gap-5 pb-8">
       <Text className="text-muted">Наборы слов</Text>
       <Text className="text-3xl font-black text-ink -mt-2 mb-2">Сеансы</Text>
       <Card className="p-5 gap-3">

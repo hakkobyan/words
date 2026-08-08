@@ -28,13 +28,13 @@ export default function Explore(){
   useEffect(()=>{scrollRef.current?.scrollTo({y:0,animated:true})},[game.status]);
 
   return <KeyboardAvoidingView className="flex-1 bg-paper" behavior={Platform.OS==='ios'?'padding':undefined}>
-    <View className="flex-row items-center justify-between px-4 pt-4 pb-3 border-b border-line bg-card">
+    <View className="flex-row items-center justify-between px-5 pt-4 pb-3 border-b border-line bg-card">
       <Pressable accessibilityRole="button" accessibilityLabel={pick('Назад','Back')} onPress={()=>router.back()} className="w-11 h-11 rounded-full border border-line items-center justify-center active:opacity-70"><ArrowLeft size={20} color={colors.ink}/></Pressable>
       <View className="items-center"><Text className="text-ink font-black">Semantic Word Hunt</Text><Text className="text-muted text-xs">{pick('Экспедиция дня','Today’s expedition')} · {completed}/5</Text></View>
       <View className="w-11 h-11 rounded-full bg-mint items-center justify-center"><Flame size={19} color={colors.green}/></View>
     </View>
     <Progress value={(completed/5)*100}/>
-    {game.allComplete?<DailyComplete xp={useVocabularyStore.getState().wordHuntProgress.xp} streak={useVocabularyStore.getState().wordHuntProgress.streak}/>:<ScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" contentContainerClassName="w-full max-w-[680px] self-center px-4 py-5 pb-24">
+    {game.allComplete?<DailyComplete xp={useVocabularyStore.getState().wordHuntProgress.xp} streak={useVocabularyStore.getState().wordHuntProgress.streak}/>:<ScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" contentContainerClassName="w-full max-w-[720px] self-center px-5 py-6 pb-24">
       {game.status==='playing'&&<Game target={game.target} {...game}/>}
       {game.status==='reveal'&&<Reveal target={game.target} onContinue={()=>game.setStatus('practice')}/>}
       {game.status==='practice'&&<Practice target={game.target} answer={game.practiceAnswer} onAnswer={game.answerPractice} onContinue={game.finishPractice}/>}

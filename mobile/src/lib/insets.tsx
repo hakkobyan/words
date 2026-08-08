@@ -23,7 +23,7 @@ export const useRealInsets = () => useContext(RealInsets);
 /** Height of the tab bar itself, before its safe-area padding. */
 export const TAB_BAR_HEIGHT = 62;
 
-const EDGE = 16;
+const EDGE = 20;
 
 /**
  * Scroll padding for a tab screen: clears the status bar at the top and the

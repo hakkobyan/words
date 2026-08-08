@@ -76,7 +76,7 @@ export default function Settings() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-paper" contentContainerClassName="p-4 gap-4 pb-8">
+    <ScrollView className="flex-1 bg-paper" contentContainerClassName="w-full max-w-[720px] self-center px-5 py-6 gap-5 pb-8">
       <Text className="text-muted">{pick('Персонализация и данные', 'Personalization and data')}</Text>
       <Text className="text-3xl font-black text-ink -mt-2 mb-2">{pick('Настройки', 'Settings')}</Text>
 
