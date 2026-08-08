@@ -76,7 +76,7 @@ export default function Quiz() {
   const { word: q, options } = deck[i];
 
   return (
-    <View className="flex-1 bg-paper p-4">
+    <View className="flex-1 w-full max-w-[720px] self-center bg-paper p-5">
       <Text className="text-muted text-sm mb-2">
         {pick('Вопрос', 'Question')} {i + 1} {pick('из', 'of')} {deck.length}
       </Text>

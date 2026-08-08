@@ -92,7 +92,7 @@ export default function Add() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="p-4 gap-4 pb-8">
+    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="w-full max-w-[720px] self-center px-5 pt-6 gap-5 pb-8">
       <Text className="text-muted">{pick('Перевод с помощью DeepL', 'Translation powered by DeepL')}</Text>
       <Text className="text-3xl font-black text-ink -mt-2 mb-2">{pick('Новое слово', 'New word')}</Text>
 

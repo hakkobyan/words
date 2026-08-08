@@ -12,7 +12,7 @@ export default function Categories() {
   const [name, setName] = useState('');
 
   return (
-    <ScrollView className="flex-1 bg-paper" contentContainerClassName="p-4 gap-4 pb-8">
+    <ScrollView className="flex-1 bg-paper" contentContainerClassName="w-full max-w-[720px] self-center px-5 py-6 gap-5 pb-8">
       <Text className="text-muted">Тематические подборки</Text>
       <Text className="text-3xl font-black text-ink -mt-2 mb-2">Категории</Text>
       <Card className="p-4 gap-3">

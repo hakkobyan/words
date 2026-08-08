@@ -7,7 +7,7 @@ import {useI18n} from '@/lib/i18n';
 import {useThemeColors} from '@/lib/theme';
 
 export function Card({children,className='',style}:{children:React.ReactNode;className?:string;style?:ViewStyle}){
-  return <View style={style} className={`bg-card border border-line rounded-[24px] ${className}`}>{children}</View>;
+  return <View style={style} className={`bg-card border border-line rounded-[20px] ${className}`}>{children}</View>;
 }
 
 type ButtonVariant='default'|'primary'|'secondary'|'danger'|'warning'|'border';
@@ -23,7 +23,7 @@ export function Button({variant='default',icon,label,onPress,disabled,fullWidth,
   const s=buttonStyles[variant];
   return (
     <Pressable disabled={disabled} onPress={onPress} accessibilityRole="button" accessibilityState={{disabled}}
-      className={`min-h-12 rounded-2xl px-[18px] flex-row items-center justify-center gap-[9px] active:opacity-80 ${s.box} ${fullWidth?'w-full':''} ${disabled?'opacity-50':''} ${className}`}>
+      className={`min-h-12 rounded-[14px] px-[18px] flex-row items-center justify-center gap-2 active:opacity-80 ${s.box} ${fullWidth?'w-full':''} ${disabled?'opacity-50':''} ${className}`}>
       {icon}
       <Text className={`font-bold ${textClassName??s.text}`}>{label}</Text>
     </Pressable>
@@ -31,7 +31,7 @@ export function Button({variant='default',icon,label,onPress,disabled,fullWidth,
 }
 
 export function Pill({children}:{children:React.ReactNode}){
-  return <View className="rounded-full px-[9px] py-[5px] bg-mint border border-[#d7bda8] self-start"><Text className="text-[12px] font-extrabold text-green tracking-wide">{children}</Text></View>;
+  return <View className="rounded-full px-3 py-1.5 bg-mint border border-line self-start"><Text className="text-[12px] font-extrabold text-green tracking-wide">{children}</Text></View>;
 }
 
 export function LanguageSelector({value,onChange}:{value:StudyLanguage;onChange:(v:StudyLanguage)=>void}){

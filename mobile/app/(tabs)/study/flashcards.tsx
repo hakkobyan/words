@@ -110,7 +110,7 @@ export default function Flashcards() {
   };
 
   return (
-    <View className="flex-1 bg-paper p-4">
+    <View className="flex-1 w-full max-w-[720px] self-center bg-paper p-5">
       <View className="flex-row justify-between mb-3">
         <Text className="font-bold text-ink">
           {i + 1} {pick('из', 'of')} {cards.length}

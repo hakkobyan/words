@@ -172,7 +172,7 @@ export default function YouTubeVocabulary() {
   const activeError = errors[errorCode] || errors.NETWORK_ERROR;
 
   return (
-    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="p-4 gap-7 pb-8">
+    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="w-full max-w-[720px] self-center px-5 pt-6 gap-6 pb-8">
       <View>
         <Text className="text-muted text-sm mb-1">Learn from real content</Text>
         <Text className="text-3xl font-black text-ink tracking-tight">YouTube Vocabulary</Text>
