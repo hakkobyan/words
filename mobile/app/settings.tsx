@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Alert, ScrollView, Switch, Text, View } from 'react-native';
+import { Alert, Modal, Platform, Pressable, ScrollView, Switch, Text, View } from 'react-native';
 import { Download, RotateCcw, Trash2, Upload } from 'lucide-react-native';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
@@ -17,6 +17,7 @@ export default function Settings() {
   const { locale, pick } = useI18n();
   const colors = useThemeColors();
   const [message, setMessage] = useState('');
+  const [confirmation, setConfirmation] = useState<'reset' | 'clear' | null>(null);
 
   const toggles = [
     ['showExamples', pick('Показывать примеры', 'Show examples')],
@@ -28,12 +29,26 @@ export default function Settings() {
   const exportData = async () => {
     try {
       const payload = backupPayload({ words: store.words, categories: store.categories, sessions: store.sessions, settings: store.settings });
-      const file = new File(Paths.cache, `vocabulary-backup-${new Date().toISOString().slice(0, 10)}.json`);
+      const filename = `vocabulary-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      if (Platform.OS === 'web') {
+        const url = URL.createObjectURL(new Blob([payload], { type: 'application/json' }));
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = filename;
+        anchor.click();
+        URL.revokeObjectURL(url);
+        setMessage(pick('Резервная копия скачана.', 'Backup downloaded.'));
+        return;
+      }
+      const file = new File(Paths.cache, filename);
       if (file.exists) file.delete();
       file.create();
       file.write(payload);
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(file.uri, { mimeType: 'application/json' });
+        setMessage(pick('Резервная копия готова.', 'Backup is ready.'));
+      } else {
+        throw new Error('SHARING_UNAVAILABLE');
       }
     } catch {
       setMessage(pick('Не удалось экспортировать данные.', 'Could not export data.'));
@@ -54,6 +69,10 @@ export default function Settings() {
   };
 
   const confirmReset = () => {
+    if (Platform.OS === 'web') {
+      setConfirmation('reset');
+      return;
+    }
     Alert.alert(
       pick('Сбросить прогресс?', 'Reset progress?'),
       pick('Все слова останутся, но прогресс изучения обнулится.', 'All words will stay, but learning progress will be reset.'),
@@ -65,6 +84,10 @@ export default function Settings() {
   };
 
   const confirmClear = () => {
+    if (Platform.OS === 'web') {
+      setConfirmation('clear');
+      return;
+    }
     Alert.alert(
       pick('Удалить все данные?', 'Delete all data?'),
       pick('Это действие необратимо.', 'This action cannot be undone.'),
@@ -73,6 +96,17 @@ export default function Settings() {
         { text: pick('Удалить', 'Delete'), style: 'destructive', onPress: store.clear },
       ]
     );
+  };
+
+  const applyDestructiveAction = () => {
+    if (confirmation === 'reset') {
+      store.resetProgress();
+      setMessage(pick('Прогресс сброшен.', 'Progress reset.'));
+    } else if (confirmation === 'clear') {
+      store.clear();
+      setMessage(pick('Все данные удалены.', 'All data deleted.'));
+    }
+    setConfirmation(null);
   };
 
   return (
@@ -176,6 +210,39 @@ export default function Settings() {
         </View>
         {!!message && <Text className="text-muted mt-2">{message}</Text>}
       </Card>
+
+      <Modal visible={confirmation !== null} transparent animationType="fade" statusBarTranslucent onRequestClose={() => setConfirmation(null)}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={pick('Закрыть подтверждение', 'Close confirmation')}
+          onPress={() => setConfirmation(null)}
+          className="flex-1 bg-black/60 px-5 items-center justify-center"
+        >
+          <Pressable onPress={() => {}} className="w-full max-w-[440px]">
+            <Card className="p-5 gap-4">
+              <View className="gap-2">
+                <Text className="text-xl font-black text-ink">
+                  {confirmation === 'reset' ? pick('Сбросить прогресс?', 'Reset progress?') : pick('Удалить все данные?', 'Delete all data?')}
+                </Text>
+                <Text className="text-muted leading-6">
+                  {confirmation === 'reset'
+                    ? pick('Все слова останутся, но прогресс изучения обнулится.', 'All words will stay, but learning progress will be reset.')
+                    : pick('Это действие необратимо.', 'This action cannot be undone.')}
+                </Text>
+              </View>
+              <View className="flex-row gap-3">
+                <Button variant="border" className="flex-1" label={pick('Отмена', 'Cancel')} onPress={() => setConfirmation(null)} />
+                <Button
+                  variant="danger"
+                  className="flex-1"
+                  label={confirmation === 'reset' ? pick('Сбросить', 'Reset') : pick('Удалить', 'Delete')}
+                  onPress={applyDestructiveAction}
+                />
+              </View>
+            </Card>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </ScrollView>
   );
 }
