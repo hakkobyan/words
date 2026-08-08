@@ -2,7 +2,7 @@ import { router, Tabs } from 'expo-router';
 import { BlurView } from 'expo-blur';
 import { Brain, Home, Library, Menu, Plus, Tv } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useI18n } from '@/lib/i18n';
 import { useIsDarkTheme, useThemeColors, withAlpha } from '@/lib/theme';
 import { dataSet } from '@/lib/web';
@@ -74,7 +74,7 @@ function CustomTabBar({ state, navigation }: { state: { routes: { key: string; n
 }
 
 export default function TabsLayout() {
-  const insets = useSafeAreaInsets();
+  const insets = useRealInsets();
   const colors = useThemeColors();
   const isDark = useIsDarkTheme();
   return (
@@ -99,10 +99,10 @@ export default function TabsLayout() {
       <View
         pointerEvents="none"
         {...dataSet({ safeTop: 'true' })}
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: insets.top }}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: insets.top, zIndex: 10 }}
       >
-        <BlurView intensity={60} tint={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
-        <View style={{ flex: 1, backgroundColor: withAlpha(colors.paper, isDark ? 0.55 : 0.6) }} />
+        <BlurView intensity={75} tint={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
+        <View style={{ flex: 1, backgroundColor: withAlpha(colors.paper, isDark ? 0.16 : 0.22) }} />
       </View>
       <Pressable
         accessibilityRole="button"
