@@ -45,6 +45,7 @@ export default function Explore(){
 
 function Game({target,guess,setGuess,guesses,hintsUsed,useHint,error,loading,submit,feedback,proximityForRank}:{target:WordHuntTarget;guess:string;setGuess:(v:string)=>void;guesses:SemanticGuess[];hintsUsed:number;useHint:()=>void;error:string;loading:boolean;submit:()=>void;feedback:string;proximityForRank:(rank:number)=>Proximity}){
   const {pick}=useI18n();const colors=useThemeColors();
+  const sortedGuesses=[...guesses].sort((a,b)=>a.rank-b.rank||a.createdAt.localeCompare(b.createdAt));
   const errors:Record<string,string>={EMPTY:pick('Введите слово.','Type a word.'),DUPLICATE:pick('Вы уже пробовали это слово.','You already tried this word.'),INVALID:pick('Попробуйте английское слово.','Try an English word.'),NETWORK:pick('Не удалось проверить слово. Попробуйте ещё раз.','Something went wrong. Try again.')};
   const feedbackText=feedback==='very-close'?pick('Вы совсем рядом.','You’re in the right neighborhood.'):feedback==='close'?pick('Очень близко.','You’re getting very close.'):feedback==='warm'?pick('Становится теплее.','You’re getting closer.'):feedback==='far'?pick('Попробуйте подумать о другом значении.','Try thinking of another meaning.'):pick('Каждая попытка покажет, насколько вы близко.','Every guess shows how close you are.');
   return <View className="gap-5">
@@ -57,7 +58,7 @@ function Game({target,guess,setGuess,guesses,hintsUsed,useHint,error,loading,sub
     </Card>
     {hintsUsed>0&&<Animated.View entering={FadeIn.duration(200)}><Card className="p-4 gap-2"><Text className="font-black text-ink">{pick('Подсказки','Hints')}</Text>{target.hints.slice(0,hintsUsed).map((hint,index)=><View key={hint} className="flex-row gap-2"><Text className="text-orange font-black">{index+1}.</Text><Text className="text-muted flex-1">{hint}</Text></View>)}</Card></Animated.View>}
     <Pressable accessibilityRole="button" disabled={hintsUsed>=3} onPress={useHint} className="self-center min-h-11 flex-row items-center gap-2 px-4 active:opacity-70"><Lightbulb size={18} color={colors.orange}/><Text className="text-green font-bold">{hintsUsed>=3?pick('Все подсказки открыты','All hints revealed'):pick(`Подсказка · награда −${hintsUsed===0?10:5} XP`,`Hint · reward −${hintsUsed===0?10:5} XP`)}</Text></Pressable>
-    {guesses.length>0&&<View className="gap-3"><View className="flex-row justify-between items-center"><Text className="text-xl font-black text-ink">{pick('Ваши догадки','Your guesses')}</Text><Text className="text-muted text-sm">{guesses.length}</Text></View>{guesses.map((item,index)=><GuessRow key={item.word} guess={item} index={index} proximity={proximityForRank(item.rank)}/>)}</View>}
+    {guesses.length>0&&<View className="gap-3"><View className="flex-row justify-between items-center"><View><Text className="text-xl font-black text-ink">{pick('Ваши догадки','Your guesses')}</Text><Text className="text-muted text-xs mt-0.5">{pick('Самые близкие — сверху','Closest guesses first')}</Text></View><Text className="text-muted text-sm">{guesses.length}</Text></View>{sortedGuesses.map((item,index)=><GuessRow key={item.word} guess={item} index={index} proximity={proximityForRank(item.rank)}/>)}</View>}
   </View>;
 }
 
