@@ -2,33 +2,36 @@ import {create} from 'zustand';
 import {generateId} from '@/lib/id';
 import {categories as defaults} from '@/data/defaults';
 import {read,write} from '@/lib/storage';
-import {Category,Settings,StudyLanguage,UserWord,VocabularySession} from '@/types';
+import {Category,Settings,StudyLanguage,UserWord,VocabularySession,WordHuntProgress} from '@/types';
 
 const baseSettings:Settings={theme:'system',interfaceLanguage:'ru',defaultLanguage:'english',learnerLevel:'B1',cardsPerSession:10,showExamples:true,shuffle:true,reverse:true,autoCategory:true,onboardingCompleted:false};
+const today=()=>new Date().toISOString().slice(0,10);
+const emptyWordHunt=():WordHuntProgress=>({date:today(),completedIds:[],xp:0,streak:0});
 type NewWord=Omit<UserWord,'id'|'createdAt'|'updatedAt'>;
 type Store={
-  words:UserWord[];categories:Category[];sessions:VocabularySession[];settings:Settings;seenDailyIds:string[];isHydrated:boolean;
+  words:UserWord[];categories:Category[];sessions:VocabularySession[];settings:Settings;seenDailyIds:string[];wordHuntProgress:WordHuntProgress;isHydrated:boolean;
   markDailySeen:(ids:string[])=>void;
   hydrate:()=>Promise<void>;addWord:(word:NewWord)=>void;addWords:(words:NewWord[])=>void;updateWord:(id:string,patch:Partial<UserWord>)=>void;deleteWord:(id:string)=>void;
   addCategory:(name:string,icon:string)=>void;deleteCategory:(id:string,withWords?:boolean)=>void;addSession:(name:string,language:StudyLanguage)=>string;updateSession:(id:string,patch:Partial<VocabularySession>)=>void;deleteSession:(id:string)=>void;
-  setSettings:(patch:Partial<Settings>)=>void;replaceData:(data:{words:UserWord[];categories:Category[];sessions:VocabularySession[];settings?:Settings})=>void;resetProgress:()=>void;clear:()=>void;
+  setSettings:(patch:Partial<Settings>)=>void;replaceData:(data:{words:UserWord[];categories:Category[];sessions:VocabularySession[];settings?:Settings})=>void;resetProgress:()=>void;clear:()=>void;completeWordHunt:(id:string,xp:number)=>void;
 };
 const persist=(state:{words:UserWord[];categories:Category[];sessions:VocabularySession[];settings:Settings})=>{write('words',state.words);write('categories',state.categories);write('sessions',state.sessions);write('settings',state.settings)};
 
 export const useVocabularyStore=create<Store>((set,get)=>({
-  words:[],categories:defaults,sessions:[],settings:baseSettings,seenDailyIds:[],isHydrated:false,
+  words:[],categories:defaults,sessions:[],settings:baseSettings,seenDailyIds:[],wordHuntProgress:emptyWordHunt(),isHydrated:false,
   markDailySeen:ids=>set(state=>{const seenDailyIds=[...new Set([...state.seenDailyIds,...ids])];write('seenDaily',seenDailyIds);return {seenDailyIds}}),
   hydrate:async()=>{
     if(get().isHydrated)return;
-    const [words,sessions,categories,settings,seenDailyIds]=await Promise.all([
+    const [words,sessions,categories,settings,seenDailyIds,wordHuntProgress]=await Promise.all([
       read<UserWord[]>('words',[]),
       read<VocabularySession[]>('sessions',[]),
       read<Category[]>('categories',defaults),
       read<Partial<Settings>>('settings',{}),
       read<string[]>('seenDaily',[]),
+      read<WordHuntProgress>('wordHunt',emptyWordHunt()),
     ]);
     const state={words,categories,sessions,settings:{...baseSettings,...settings},isHydrated:true};
-    set({...state,seenDailyIds});
+    set({...state,seenDailyIds,wordHuntProgress});
     persist(state);
   },
   addWord:word=>{
@@ -62,7 +65,21 @@ export const useVocabularyStore=create<Store>((set,get)=>({
   updateSession:(id,patch)=>set(state=>{const next={sessions:state.sessions.map(session=>session.id===id?{...session,...patch,updatedAt:new Date().toISOString()}:session)};persist({...state,...next});return next}),
   deleteSession:id=>set(state=>{const next={sessions:state.sessions.filter(session=>session.id!==id),words:state.words.filter(word=>word.sessionId!==id)};persist({...state,...next});return next}),
   setSettings:patch=>set(state=>{const next={settings:{...state.settings,...patch}};persist({...state,...next});return next}),
+  completeWordHunt:(id,xp)=>set(state=>{
+    const date=today(),current=state.wordHuntProgress.date===date?state.wordHuntProgress:{...state.wordHuntProgress,date,completedIds:[]};
+    if(current.completedIds.includes(id))return state;
+    const completedIds=[...current.completedIds,id];
+    let streak=current.streak,lastCompletedDate=current.lastCompletedDate;
+    if(completedIds.length===5){
+      const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+      streak=lastCompletedDate===yesterday?streak+1:lastCompletedDate===date?streak:1;
+      lastCompletedDate=date;
+    }
+    const wordHuntProgress={...current,completedIds,xp:current.xp+xp,streak,lastCompletedDate};
+    write('wordHunt',wordHuntProgress);
+    return {wordHuntProgress};
+  }),
   replaceData:data=>set(state=>{const next={...data,settings:{...baseSettings,...(data.settings||state.settings)}};persist(next);return next}),
   resetProgress:()=>set(state=>{const next={words:state.words.map(word=>({...word,learned:false,difficulty:'new' as const,correctAnswers:0,wrongAnswers:0,nextReviewAt:undefined,lastReviewedAt:undefined}))};persist({...state,...next});return next}),
-  clear:()=>{const next={words:[],sessions:[],categories:defaults,settings:baseSettings};persist(next);write('seenDaily',[]);set({...next,seenDailyIds:[]});},
+  clear:()=>{const next={words:[],sessions:[],categories:defaults,settings:baseSettings};persist(next);write('seenDaily',[]);write('wordHunt',emptyWordHunt());set({...next,seenDailyIds:[],wordHuntProgress:emptyWordHunt()});},
 }));

@@ -61,6 +61,7 @@ export default function RootLayout() {
       <Stack.Screen name="categories/[categoryId]" options={{ ...header, title: '' }} />
       <Stack.Screen name="sessions" options={{ ...header, title: pick('Сеансы', 'Sessions') }} />
       <Stack.Screen name="settings" options={{ ...header, title: pick('Настройки', 'Settings') }} />
+      <Stack.Screen name="explore" options={{ headerShown: false }} />
     </Stack>
     </RealInsetsProvider>
   );

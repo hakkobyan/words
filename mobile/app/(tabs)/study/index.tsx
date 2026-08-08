@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { ArrowRight, Flame, HelpCircle, Layers } from 'lucide-react-native';
+import { ArrowRight, Flame, HelpCircle, Layers, Sparkles } from 'lucide-react-native';
 import { useVocabularyStore } from '@/store/useVocabularyStore';
 import { Card } from '@/components/ui/Parts';
 import { useScreenPadding } from '@/lib/insets';
@@ -18,6 +18,7 @@ export default function Study() {
   const languageName = s.settings.defaultLanguage === 'english' ? pick('английских', 'English') : pick('немецких', 'German');
 
   const modes = [
+    [Sparkles, pick('Охота за словом', 'Word Hunt'), pick('Находите скрытые слова по смыслу, изучайте их и закрепляйте на практике', 'Discover hidden words by meaning, learn them, and make them stick'), '/explore'],
     [Layers, pick('Флеш-карточки', 'Flashcards'), pick('Переворачивайте карточки и оценивайте знание', 'Flip cards and rate your knowledge'), '/study/flashcards'],
     [HelpCircle, pick('Квиз', 'Quiz'), pick('Выберите правильный перевод из четырёх вариантов', 'Choose the correct translation from four options'), '/study/quiz'],
   ] as const;
