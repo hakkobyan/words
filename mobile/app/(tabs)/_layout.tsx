@@ -53,15 +53,16 @@ function CustomTabBar({ state, navigation }: { state: { routes: { key: string; n
         return (
           <Pressable
             key={route.key}
-            accessibilityRole="button"
+            accessibilityRole="tab"
             accessibilityLabel={tabLabel(route.name, t)}
+            accessibilityState={{selected:isFocused}}
             onPress={() => navigation.navigate(route.name)}
-            className="flex-1 items-center gap-1 py-1"
+            className="min-h-14 flex-1 items-center justify-center gap-1 py-1"
           >
-            <View className={isAdd ? 'bg-primary-bg rounded-2xl p-3 -mt-7' : ''} style={isAdd ? { shadowColor: '#4f3026', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, elevation: 4 } : undefined}>
-              <Icon size={isAdd ? 25 : 20} color={isAdd ? '#fffaf4' : isFocused ? colors.green : colors.muted} />
+            <View className={isAdd?'bg-primary-bg rounded-2xl p-3 -mt-6':isFocused?'bg-mint rounded-xl px-3 py-1':'px-3 py-1'} style={isAdd?{elevation:4}:undefined}>
+              <Icon size={isAdd?24:20} strokeWidth={isFocused?2.4:1.8} color={isAdd?'#fffaf4':isFocused?colors.green:colors.muted}/>
             </View>
-            <Text style={{ color: isFocused ? colors.green : colors.muted, fontWeight: isFocused ? '700' : '400', fontSize: 10 }}>
+            <Text style={{color:isFocused?colors.green:colors.muted,fontWeight:isFocused?'700':'500',fontSize:11}}>
               {tabLabel(route.name, t)}
             </Text>
           </Pressable>
