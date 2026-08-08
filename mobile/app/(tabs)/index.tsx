@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Link, router } from 'expo-router';
-import { ArrowRight, BookOpen, Flame, Plus, RotateCcw } from 'lucide-react-native';
+import { ArrowRight, BookMarked, BookOpen, Flame, Library, Plus, RotateCcw } from 'lucide-react-native';
 import { useVocabularyStore } from '@/store/useVocabularyStore';
 import { Button, Card, Pill, Progress } from '@/components/ui/Parts';
 import { categoryLabel, useI18n } from '@/lib/i18n';
@@ -29,17 +29,17 @@ export default function Home() {
   ).length;
   const pct = s.words.length ? Math.round((learned / s.words.length) * 100) : 0;
   const stats = [
-    [s.words.length, pick('Всего слов', 'Total words'), '📚'],
-    [s.words.filter((w) => w.language === 'english').length, pick('Английских', 'English'), 'GB'],
-    [s.words.filter((w) => w.language === 'german').length, pick('Немецких', 'German'), 'DE'],
-    [due, pick('На повторение', 'To review'), '🔥'],
+    {value:s.words.length,label:pick('Всего','Total'),icon:Library},
+    {value:s.words.filter((w) => w.language === 'english').length,label:pick('Английских','English'),code:'EN'},
+    {value:s.words.filter((w) => w.language === 'german').length,label:pick('Немецких','German'),code:'DE'},
+    {value:due,label:pick('Повторить','Review'),icon:Flame},
   ] as const;
 
   return (
-    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="p-4 gap-7 pb-8">
-      <View>
-        <Text className="text-muted text-sm mb-1">{pick('Ваш словарь', 'Your vocabulary')}</Text>
-        <Text className="text-3xl font-black text-ink tracking-tight">
+    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="px-4 pt-5 gap-5 pb-28">
+      <View className="pr-12">
+        <Text className="text-green text-xs font-black tracking-wider mb-1">{pick('ВАШ СЛОВАРЬ', 'YOUR VOCABULARY')}</Text>
+        <Text className="text-[32px] leading-[38px] font-black text-ink tracking-tight">
           {pick('Продолжим учиться?', 'Ready to keep learning?')}
         </Text>
       </View>
@@ -48,13 +48,16 @@ export default function Home() {
         <Pill>{s.settings.defaultLanguage === 'english' ? pick('Английский', 'English') : pick('Немецкий', 'German')}</Pill>
       </Pressable>
 
-      <View className="bg-hero-bg rounded-[22px] p-6 gap-3">
-        <Text className="text-hero-text text-sm">{pick('ОБЩИЙ ПРОГРЕСС', 'OVERALL PROGRESS')}</Text>
-        <View className="flex-row items-end gap-3">
-          <Text className="text-hero-text text-5xl font-black">{pct}%</Text>
-          <Text className="text-hero-text pb-2">
+      <View className="bg-hero-bg rounded-[28px] p-5 gap-4">
+        <View className="flex-row items-center justify-between">
+          <Text className="text-hero-text/75 text-xs font-bold tracking-wider">{pick('ОБЩИЙ ПРОГРЕСС', 'OVERALL PROGRESS')}</Text>
+          <Text className="text-hero-text text-4xl font-black">{pct}%</Text>
+        </View>
+        <View>
+          <Text className="text-hero-text text-base font-semibold">
             {learned} {pick('из', 'of')} {s.words.length} {pick('слов изучено', 'words learned')}
           </Text>
+          <Text className="text-hero-text/70 text-sm mt-1">{pick('Продолжайте в своём темпе', 'Keep going at your own pace')}</Text>
         </View>
         <Progress value={pct} />
         <View className="flex-row gap-3 mt-3">
@@ -74,18 +77,19 @@ export default function Home() {
         </View>
       </View>
 
-      <View className="flex-row flex-wrap gap-3">
-        {stats.map(([n, l, e]) => (
-          <Card key={l} className="p-5" style={{ width: '47%' }}>
-            <Text className="text-2xl">{e}</Text>
-            <Text className="text-3xl font-black text-ink mt-3">{n}</Text>
-            <Text className="text-muted text-sm">{l}</Text>
-          </Card>
-        ))}
-      </View>
+      <Card className="p-2 flex-row">
+        {stats.map((stat,index)=>{
+          const Icon='icon' in stat?stat.icon:null;
+          return <View key={stat.label} className={`flex-1 items-center py-3 px-1 ${index?'border-l border-line':''}`}>
+            <View className="h-6 justify-center">{Icon?<Icon size={17} color={colors.green}/>:<Text className="text-green text-xs font-black">{'code' in stat?stat.code:''}</Text>}</View>
+            <Text className="text-xl font-black text-ink">{stat.value}</Text>
+            <Text className="text-muted text-[11px] text-center" numberOfLines={1}>{stat.label}</Text>
+          </View>;
+        })}
+      </Card>
 
       <View className="gap-6">
-        <View>
+        {s.sessions.length>0&&<View>
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-xl font-bold text-ink">{pick('Сегодня на повторение', 'Review today')}</Text>
             <Link href="/study" asChild>
@@ -110,7 +114,7 @@ export default function Home() {
               <ArrowRight color={colors.ink} />
             </Card>
           </Pressable>
-        </View>
+        </View>}
 
         <View>
           <Text className="text-xl font-bold text-ink mb-4">{pick('Недавние сеансы', 'Recent sessions')}</Text>
@@ -152,7 +156,7 @@ export default function Home() {
               <Link href={`/categories/${c.id}`} key={c.id} asChild>
                 <Pressable style={{ width: '47%' }}>
                   <Card className="p-4">
-                    <Text className="text-2xl">{c.icon}</Text>
+                    <View className="w-10 h-10 rounded-xl bg-mint items-center justify-center"><BookMarked size={20} color={colors.green}/></View>
                     <Text className="font-bold text-ink mt-3">{categoryLabel(c.id, c.name, locale)}</Text>
                     <Text className="text-muted text-xs mb-3">
                       {ws.length} {pick('слов', 'words')} · {p}%

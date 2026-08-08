@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {Pressable, ScrollView, Text, TextInput, View} from 'react-native';
-import {ClipboardList, Sparkles} from 'lucide-react-native';
+import {BookOpen, Check, ClipboardList, Sparkles} from 'lucide-react-native';
 import {useVocabularyStore} from '@/store/useVocabularyStore';
 import {useI18n} from '@/lib/i18n';
 import {useThemeColors} from '@/lib/theme';
@@ -33,6 +33,7 @@ export default function Onboarding() {
   const [resultLevel, setResultLevel] = useState<CefrLevel>('B1');
 
   const words = levelTestWords[language];
+  const stepNumber = step === 'welcome' ? 1 : step === 'method' || step === 'manual' ? 2 : 3;
 
   const finish = (level: CefrLevel) => {
     // The level test already covered plenty of typing — start the daily warm-up next launch.
@@ -54,13 +55,32 @@ export default function Onboarding() {
 
   return (
     <View className="flex-1 bg-paper">
-      <ScrollView contentContainerClassName="flex-grow justify-center p-4">
-        <Card className="p-6 gap-5">
+      <ScrollView contentContainerClassName="flex-grow justify-center px-4 py-8">
+        <View className="w-full max-w-[520px] self-center gap-5">
+          <View className="flex-row items-center justify-between px-1">
+            <View className="flex-row items-center gap-2">
+              <View className="w-9 h-9 rounded-xl bg-primary-bg items-center justify-center">
+                <BookOpen size={19} color={colors.cardStrong} />
+              </View>
+              <Text className="text-ink text-lg font-black">words</Text>
+            </View>
+            <Text className="text-muted text-xs font-bold">{stepNumber} / 3</Text>
+          </View>
+          <View className="flex-row gap-2 px-1">
+            {[1,2,3].map(n=><View key={n} className={`h-1.5 flex-1 rounded-full ${n<=stepNumber?'bg-orange':'bg-paper-2'}`}/>) }
+          </View>
+        <Card className="p-6 gap-5 rounded-[28px]">
           {step === 'welcome' && (
             <>
-              <View className="bg-mint rounded-2xl p-3 self-start"><Sparkles size={26} color={colors.green} /></View>
-              <Text className="text-3xl font-black text-ink">{pick('Добро пожаловать в words!', 'Welcome to words!')}</Text>
-              <Text className="text-muted">{pick('Какой язык вы учите?', 'Which language are you learning?')}</Text>
+              <View className="bg-mint rounded-[20px] p-3.5 self-start"><Sparkles size={28} color={colors.green} /></View>
+              <View className="gap-2">
+                <Text className="text-[34px] leading-[40px] font-black text-ink">{pick('Учите слова без зубрёжки', 'Learn words without cramming')}</Text>
+                <Text className="text-muted text-base leading-6">{pick('Соберём личный словарь и подберём короткие тренировки под ваш уровень.', 'Build a personal vocabulary and get short sessions matched to your level.')}</Text>
+              </View>
+              <View className="flex-row gap-2 flex-wrap">
+                {[pick('5 минут в день','5 min a day'),pick('Свой темп','Your pace'),pick('Без регистрации','No sign-up')].map(item=><View key={item} className="flex-row items-center gap-1.5 bg-paper-2 rounded-full px-3 py-2"><Check size={14} color={colors.success}/><Text className="text-ink text-xs font-bold">{item}</Text></View>)}
+              </View>
+              <Text className="text-ink font-bold mt-1">{pick('Какой язык вы учите?', 'Which language are you learning?')}</Text>
               <LanguageSelector value={language} onChange={setLanguage} />
               <Button variant="primary" fullWidth label={pick('Продолжить', 'Continue')} onPress={() => setStep('method')} />
             </>
@@ -148,6 +168,8 @@ export default function Onboarding() {
             </>
           )}
         </Card>
+        <Text className="text-muted text-xs text-center px-8">{pick('Настройки можно изменить позже', 'You can change these settings later')}</Text>
+        </View>
       </ScrollView>
     </View>
   );
