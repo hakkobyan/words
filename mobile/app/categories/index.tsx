@@ -40,7 +40,7 @@ export default function Categories() {
           const ws = s.words.filter((w) => w.categoryId === c.id);
           const p = ws.length ? Math.round((ws.filter((w) => w.learned).length / ws.length) * 100) : 0;
           return (
-            <View key={c.id} style={{ width: '47%' }}>
+            <View key={c.id} style={{flexBasis:'47%',flexGrow:1}}>
               <Pressable onPress={() => router.push(`/categories/${c.id}`)}>
                 <Card className="p-5">
                   <Text className="text-3xl">{c.icon}</Text>

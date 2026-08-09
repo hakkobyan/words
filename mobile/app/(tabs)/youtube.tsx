@@ -268,7 +268,7 @@ export default function YouTubeVocabulary() {
               ].map(([Icon, value, label]) => {
                 const Metric = Icon as typeof Clock3;
                 return (
-                  <View key={label as string} style={{ width: '47%' }}>
+                  <View key={label as string} style={{flexBasis:'47%',flexGrow:1}}>
                     <Metric size={17} color={colors.muted} />
                     <Text className="font-bold text-lg text-ink mt-2">{value as string}</Text>
                     <Text className="text-muted text-xs">{label as string}</Text>
