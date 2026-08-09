@@ -118,9 +118,9 @@ export default function Add() {
         </View>
 
         {suggestions.length > 0 && (
-          <View className="rounded-2xl p-4 bg-mint border border-line gap-2">
+          <View className="rounded-2xl p-4 bg-lilac border border-line gap-2">
             <View className="flex-row items-center gap-2 mb-1">
-              <Sparkles size={17} color={colors.green} />
+              <Sparkles size={17} color={colors.plum} />
               <Text className="text-sm font-bold text-ink">{pick('DeepL предлагает', 'DeepL suggests')}</Text>
             </View>
             {suggestions.map((x) => (
@@ -133,7 +133,7 @@ export default function Add() {
                 className="min-h-12 bg-card-strong rounded-2xl px-4 flex-row items-center justify-between"
               >
                 <Text className="text-ink">{x}</Text>
-                <Check size={17} color={colors.green} />
+                <Check size={17} color={colors.plum} />
               </Pressable>
             ))}
           </View>
@@ -183,7 +183,7 @@ export default function Add() {
         )}
 
         <View className="gap-3">
-          <Button variant="secondary" icon={<Check size={18} color={colors.green} />} label={pick('Добавить слово', 'Add word')} onPress={() => save(false)} fullWidth />
+          <Button variant="secondary" icon={<Check size={18} color={colors.plum} />} label={pick('Добавить слово', 'Add word')} onPress={() => save(false)} fullWidth />
           <Button variant="primary" icon={<Plus size={18} color={colors.onPrimary} />} label={pick('Добавить и продолжить', 'Add and continue')} onPress={() => save(true)} fullWidth />
         </View>
       </Card>

@@ -33,8 +33,8 @@ export default function Study() {
       </View>
 
       <Card className="p-5 flex-row items-center gap-4">
-        <View className="bg-mint p-4 rounded-2xl">
-          <Flame color={colors.green} />
+        <View className="bg-lilac p-4 rounded-2xl">
+          <Flame color={colors.plum} />
         </View>
         <View className="flex-1">
           <Text className="font-bold text-ink">
@@ -48,14 +48,14 @@ export default function Study() {
         {modes.map(([Icon, title, text, href]) => (
           <Pressable key={title} onPress={() => router.push(href)}>
             <Card className="p-5">
-              <View className="bg-mint self-start p-4 rounded-2xl">
-                <Icon size={28} color={colors.green} />
+              <View className="bg-lilac self-start p-4 rounded-2xl">
+                <Icon size={28} color={colors.plum} />
               </View>
               <Text className="font-bold text-xl text-ink mt-5">{title}</Text>
               <Text className="text-muted mt-2 mb-5">{text}</Text>
               <View className="flex-row items-center gap-2">
-                <Text className="font-bold text-green">{pick('Начать', 'Start')}</Text>
-                <ArrowRight size={18} color={colors.green} />
+                <Text className="font-bold text-plum">{pick('Начать', 'Start')}</Text>
+                <ArrowRight size={18} color={colors.plum} />
               </View>
             </Card>
           </Pressable>

@@ -1,7 +1,7 @@
 import {useColorScheme} from 'nativewind';
 
-const light={ink:'#241c18',muted:'#75655c',paper:'#f6efe7',paper2:'#ede3d8',card:'#fffcf8',cardStrong:'#ffffff',green:'#66566f',mint:'#ede5ef',orange:'#c97852',line:'#ded0c4',danger:'#a23f36',success:'#5f617a',placeholder:'#76655c',onPrimary:'#fffaf4'};
-const dark={ink:'#f7f1eb',muted:'#bdaea5',paper:'#171412',paper2:'#24201d',card:'#29231f',cardStrong:'#332b26',green:'#c8b2cf',mint:'#3d3040',orange:'#e09a75',line:'#493e37',danger:'#ef8f85',success:'#bec0da',placeholder:'#bca79b',onPrimary:'#221713'};
+const light={ink:'#241c18',muted:'#75655c',paper:'#f6efe7',paper2:'#ede3d8',card:'#fffcf8',cardStrong:'#ffffff',plum:'#66566f',lilac:'#ede5ef',orange:'#c97852',line:'#ded0c4',danger:'#a23f36',success:'#5f617a',placeholder:'#76655c',onPrimary:'#fffaf4'};
+const dark={ink:'#f7f1eb',muted:'#bdaea5',paper:'#171412',paper2:'#24201d',card:'#29231f',cardStrong:'#332b26',plum:'#c8b2cf',lilac:'#3d3040',orange:'#e09a75',line:'#493e37',danger:'#ef8f85',success:'#bec0da',placeholder:'#bca79b',onPrimary:'#221713'};
 
 export function useThemeColors(){
   const {colorScheme}=useColorScheme();
