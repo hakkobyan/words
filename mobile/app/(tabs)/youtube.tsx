@@ -172,14 +172,14 @@ export default function YouTubeVocabulary() {
   const activeError = errors[errorCode] || errors.NETWORK_ERROR;
 
   return (
-    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="w-full max-w-[720px] self-center px-5 pt-6 gap-6 pb-8">
+    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="w-full max-w-[720px] self-center px-4 pt-5 gap-5 pb-8">
       <View>
         <Text className="text-muted text-sm mb-1">Learn from real content</Text>
         <Text className="text-3xl font-black text-ink tracking-tight">YouTube Vocabulary</Text>
         <Text className="text-muted mt-3 text-lg">Paste any YouTube video link and automatically generate a vocabulary list from its subtitles.</Text>
       </View>
 
-      <Card className="p-5 gap-4">
+      <Card className="p-4 gap-4">
         <Text className="font-bold text-ink">Paste YouTube URL</Text>
         <View className="relative">
           <View className="absolute left-4 top-3.5 z-10">

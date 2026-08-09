@@ -36,7 +36,7 @@ export default function Home() {
   ] as const;
 
   return (
-    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="w-full max-w-[720px] self-center p-4 gap-7 pb-28">
+    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="w-full max-w-[720px] self-center p-4 gap-5 pb-28">
       <View className="pr-14">
         <Text className="text-muted text-sm mb-1">{pick('Ваш словарь', 'Your vocabulary')}</Text>
         <Text className="text-3xl font-black text-ink tracking-tight">
@@ -48,7 +48,7 @@ export default function Home() {
         <Pill>{s.settings.defaultLanguage === 'english' ? pick('Английский', 'English') : pick('Немецкий', 'German')}</Pill>
       </Pressable>
 
-      <View className="rounded-[22px] p-6 gap-3" style={{backgroundColor:colors.heroBg}}>
+      <View className="rounded-[22px] p-5 gap-3" style={{backgroundColor:colors.heroBg}}>
         <Text className="text-sm" style={{color:colors.heroText}}>{pick('ОБЩИЙ ПРОГРЕСС', 'OVERALL PROGRESS')}</Text>
         <View className="flex-row items-end gap-3">
           <Text className="text-5xl font-black" style={{color:colors.heroText}}>{pct}%</Text>
@@ -75,7 +75,7 @@ export default function Home() {
       </View>
 
       <View className="flex-row flex-wrap gap-3">
-        {stats.map(([n,l,e])=><Card key={l} className="p-5" style={{width:'47%'}}><Text className="text-2xl">{e}</Text><Text className="text-3xl font-black text-ink mt-3">{n}</Text><Text className="text-muted text-sm">{l}</Text></Card>)}
+        {stats.map(([n,l,e])=><Card key={l} className="p-4" style={{width:'47%'}}><Text className="text-xl">{e}</Text><Text className="text-2xl font-black text-ink mt-2">{n}</Text><Text className="text-muted text-sm">{l}</Text></Card>)}
       </View>
 
       <View className="gap-6">
@@ -89,8 +89,8 @@ export default function Home() {
             </Link>
           </View>
           <Pressable onPress={() => router.push('/study/flashcards')}>
-            <Card className="p-6 flex-row gap-5 items-center">
-              <View className="bg-mint rounded-2xl p-4">
+            <Card className="p-4 flex-row gap-4 items-center">
+              <View className="bg-mint rounded-2xl p-3">
                 <RotateCcw color={colors.green} />
               </View>
               <View className="flex-1">

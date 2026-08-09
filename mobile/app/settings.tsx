@@ -110,11 +110,11 @@ export default function Settings() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-paper" contentContainerClassName="w-full max-w-[720px] self-center px-5 py-6 gap-5 pb-8">
+    <ScrollView className="flex-1 bg-paper" contentContainerClassName="w-full max-w-[720px] self-center px-4 py-5 gap-4 pb-8">
       <Text className="text-muted">{pick('Персонализация и данные', 'Personalization and data')}</Text>
       <Text className="text-3xl font-black text-ink -mt-2 mb-2">{pick('Настройки', 'Settings')}</Text>
 
-      <Card className="p-5 gap-5">
+      <Card className="p-4 gap-4">
         <Text className="font-bold text-lg text-ink">{pick('Внешний вид', 'Appearance')}</Text>
         <View className="gap-2">
           <Text className="font-bold text-sm text-ink">{pick('Язык интерфейса', 'Interface language')}</Text>
@@ -143,7 +143,7 @@ export default function Settings() {
         </View>
       </Card>
 
-      <Card className="p-5 gap-5">
+      <Card className="p-4 gap-4">
         <Text className="font-bold text-lg text-ink">{pick('Обучение', 'Learning')}</Text>
         <View className="gap-2">
           <Text className="font-bold text-sm text-ink">{pick('Язык обучения', 'Learning language')}</Text>
@@ -220,7 +220,7 @@ export default function Settings() {
         ))}
       </Card>
 
-      <Card className="p-5 gap-4">
+      <Card className="p-4 gap-4">
         <Text className="font-bold text-lg text-ink">{pick('Мои данные', 'My data')}</Text>
         <View className="gap-3">
           <Button variant="secondary" icon={<Download size={18} color={colors.green} />} label={pick('Экспорт JSON', 'Export JSON')} onPress={exportData} fullWidth />

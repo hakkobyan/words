@@ -13,7 +13,7 @@ export default function Category() {
   if (!c) return <View className="flex-1 bg-paper p-4"><Text className="text-ink">Категория не найдена</Text></View>;
 
   return (
-    <ScrollView className="flex-1 bg-paper" contentContainerClassName="w-full max-w-[720px] self-center px-5 py-6 gap-5 pb-8">
+    <ScrollView className="flex-1 bg-paper" contentContainerClassName="w-full max-w-[720px] self-center px-4 py-5 gap-4 pb-8">
       <Card className="p-6">
         <Text className="text-4xl">{c.icon}</Text>
         <Text className="text-3xl font-black text-ink mt-3">{c.name}</Text>

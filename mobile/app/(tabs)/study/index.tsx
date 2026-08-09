@@ -24,7 +24,7 @@ export default function Study() {
   ] as const;
 
   return (
-    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="w-full max-w-[720px] self-center px-5 pt-6 gap-5 pb-8">
+    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="w-full max-w-[720px] self-center px-4 pt-5 gap-4 pb-8">
       <View className="gap-4">
         <View>
           <Text className="text-muted">{pick('Выберите формат', 'Choose a mode')}</Text>
@@ -32,8 +32,8 @@ export default function Study() {
         </View>
       </View>
 
-      <Card className="p-5 flex-row items-center gap-4">
-        <View className="bg-mint p-4 rounded-2xl">
+      <Card className="p-4 flex-row items-center gap-3">
+        <View className="bg-mint p-3 rounded-2xl">
           <Flame color={colors.green} />
         </View>
         <View className="flex-1">
@@ -47,8 +47,8 @@ export default function Study() {
       <View className="gap-4">
         {modes.map(([Icon, title, text, href]) => (
           <Pressable key={title} onPress={() => router.push(href)}>
-            <Card className="p-5">
-              <View className="bg-mint self-start p-4 rounded-2xl">
+            <Card className="p-4">
+              <View className="bg-mint self-start p-3 rounded-2xl">
                 <Icon size={28} color={colors.green} />
               </View>
               <Text className="font-bold text-xl text-ink mt-5">{title}</Text>
