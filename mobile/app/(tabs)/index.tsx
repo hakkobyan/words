@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Link, router } from 'expo-router';
-import { ArrowRight, BookMarked, BookOpen, Flame, Library, Plus, RotateCcw } from 'lucide-react-native';
+import { ArrowRight, BookOpen, Flame, Plus, RotateCcw } from 'lucide-react-native';
 import { useVocabularyStore } from '@/store/useVocabularyStore';
 import { Button, Card, Pill, Progress } from '@/components/ui/Parts';
 import { categoryLabel, useI18n } from '@/lib/i18n';
@@ -29,17 +29,17 @@ export default function Home() {
   ).length;
   const pct = s.words.length ? Math.round((learned / s.words.length) * 100) : 0;
   const stats = [
-    {value:s.words.length,label:pick('Всего','Total'),icon:Library},
-    {value:s.words.filter((w) => w.language === 'english').length,label:pick('Английских','English'),code:'EN'},
-    {value:s.words.filter((w) => w.language === 'german').length,label:pick('Немецких','German'),code:'DE'},
-    {value:due,label:pick('Повторить','Review'),icon:Flame},
+    [s.words.length, pick('Всего слов', 'Total words'), '📚'],
+    [s.words.filter((w) => w.language === 'english').length, pick('Английских', 'English'), 'GB'],
+    [s.words.filter((w) => w.language === 'german').length, pick('Немецких', 'German'), 'DE'],
+    [due, pick('На повторение', 'To review'), '🔥'],
   ] as const;
 
   return (
-    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="w-full max-w-[720px] self-center px-5 pt-6 gap-6 pb-28">
-      <View className="pr-14 gap-1">
-        <Text className="text-plum text-xs font-black tracking-wider mb-1">{pick('ВАШ СЛОВАРЬ', 'YOUR VOCABULARY')}</Text>
-        <Text className="text-[32px] leading-[38px] font-black text-ink tracking-tight">
+    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="w-full max-w-[720px] self-center p-4 gap-7 pb-28">
+      <View className="pr-14">
+        <Text className="text-muted text-sm mb-1">{pick('Ваш словарь', 'Your vocabulary')}</Text>
+        <Text className="text-3xl font-black text-ink tracking-tight">
           {pick('Продолжим учиться?', 'Ready to keep learning?')}
         </Text>
       </View>
@@ -48,47 +48,35 @@ export default function Home() {
         <Pill>{s.settings.defaultLanguage === 'english' ? pick('Английский', 'English') : pick('Немецкий', 'German')}</Pill>
       </Pressable>
 
-      <View className="rounded-[24px] p-6 gap-5" style={{backgroundColor:colors.heroBg}}>
-        <View className="flex-row items-center justify-between">
-          <Text className="text-xs font-bold tracking-wider" style={{color:colors.heroText,opacity:0.75}}>{pick('ОБЩИЙ ПРОГРЕСС', 'OVERALL PROGRESS')}</Text>
-          <Text className="text-4xl font-black" style={{color:colors.heroText}}>{pct}%</Text>
-        </View>
-        <View>
-          <Text className="text-base font-semibold" style={{color:colors.heroText}}>
+      <View className="rounded-[22px] p-6 gap-3" style={{backgroundColor:colors.heroBg}}>
+        <Text className="text-sm" style={{color:colors.heroText}}>{pick('ОБЩИЙ ПРОГРЕСС', 'OVERALL PROGRESS')}</Text>
+        <View className="flex-row items-end gap-3">
+          <Text className="text-5xl font-black" style={{color:colors.heroText}}>{pct}%</Text>
+          <Text className="pb-2" style={{color:colors.heroText}}>
             {learned} {pick('из', 'of')} {s.words.length} {pick('слов изучено', 'words learned')}
           </Text>
-          <Text className="text-sm mt-1" style={{color:colors.heroText,opacity:0.72}}>{pick('Продолжайте в своём темпе', 'Keep going at your own pace')}</Text>
         </View>
-        <Progress value={pct} onDark />
-        <View className="flex-row gap-3 mt-1">
+        <Progress value={pct} />
+        <View className="flex-row gap-3 mt-3">
           <Button
-            className="flex-1 bg-hero-action-bg border-hero-action-bg"
+            className="bg-hero-action-bg border-hero-action-bg"
             textClassName="text-hero-action-text"
             icon={<BookOpen size={19} color={colors.heroActionText} />}
             label={pick('Начать тренировку', 'Start studying')}
             onPress={() => router.push('/study/flashcards')}
           />
           <Button
-            variant="border"
-            className="flex-1 border-white/70"
-            textClassName="text-hero-text"
-            icon={<Plus size={19} color={colors.heroText} />}
+            variant="secondary"
+            icon={<Plus size={19} color={colors.green} />}
             label={pick('Слово', 'Word')}
             onPress={() => router.push('/add')}
           />
         </View>
       </View>
 
-      <Card className="p-2 flex-row">
-        {stats.map((stat,index)=>{
-          const Icon='icon' in stat?stat.icon:null;
-          return <View key={stat.label} className={`flex-1 items-center py-3 px-1 ${index?'border-l border-line':''}`}>
-            <View className="h-6 justify-center">{Icon?<Icon size={17} color={colors.plum}/>:<Text className="text-plum text-xs font-black">{'code' in stat?stat.code:''}</Text>}</View>
-            <Text className="text-xl font-black text-ink">{stat.value}</Text>
-            <Text className="text-muted text-[11px] text-center" numberOfLines={1}>{stat.label}</Text>
-          </View>;
-        })}
-      </Card>
+      <View className="flex-row flex-wrap gap-3">
+        {stats.map(([n,l,e])=><Card key={l} className="p-5" style={{width:'47%'}}><Text className="text-2xl">{e}</Text><Text className="text-3xl font-black text-ink mt-3">{n}</Text><Text className="text-muted text-sm">{l}</Text></Card>)}
+      </View>
 
       <View className="gap-6">
         {s.sessions.length>0&&<View>
@@ -96,14 +84,14 @@ export default function Home() {
             <Text className="text-xl font-bold text-ink">{pick('Сегодня на повторение', 'Review today')}</Text>
             <Link href="/study" asChild>
               <Pressable>
-                <Text className="text-plum font-bold">{pick('Все режимы', 'All modes')}</Text>
+                <Text className="text-green font-bold">{pick('Все режимы', 'All modes')}</Text>
               </Pressable>
             </Link>
           </View>
           <Pressable onPress={() => router.push('/study/flashcards')}>
             <Card className="p-6 flex-row gap-5 items-center">
-              <View className="bg-lilac rounded-2xl p-4">
-                <RotateCcw color={colors.plum} />
+              <View className="bg-mint rounded-2xl p-4">
+                <RotateCcw color={colors.green} />
               </View>
               <View className="flex-1">
                 <Text className="text-lg font-bold text-ink">
@@ -146,7 +134,7 @@ export default function Home() {
           <Text className="text-xl font-bold text-ink">{pick('Популярные категории', 'Popular categories')}</Text>
           <Link href="/categories" asChild>
             <Pressable>
-              <Text className="text-plum font-bold">{pick('Все', 'All')}</Text>
+              <Text className="text-green font-bold">{pick('Все', 'All')}</Text>
             </Pressable>
           </Link>
         </View>
@@ -156,9 +144,9 @@ export default function Home() {
             const p = ws.length ? Math.round((ws.filter((w) => w.learned).length / ws.length) * 100) : 0;
             return (
               <Link href={`/categories/${c.id}`} key={c.id} asChild>
-                <Pressable style={{ flexBasis: '47%', flexGrow: 1 }}>
+                <Pressable style={{ width: '47%' }}>
                   <Card className="p-4">
-                    <View className="w-10 h-10 rounded-xl bg-lilac items-center justify-center"><BookMarked size={20} color={colors.plum}/></View>
+                    <Text className="text-2xl">{c.icon}</Text>
                     <Text className="font-bold text-ink mt-3">{categoryLabel(c.id, c.name, locale)}</Text>
                     <Text className="text-muted text-xs mb-3">
                       {ws.length} {pick('слов', 'words')} · {p}%

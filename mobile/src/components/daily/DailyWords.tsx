@@ -49,7 +49,7 @@ export default function DailyWords({onDone}: {onDone: () => void}) {
   if (!card) {
     return (
       <Shell>
-        <View className="bg-lilac rounded-2xl p-3 self-center"><Sparkles size={26} color={colors.plum} /></View>
+        <View className="bg-mint rounded-2xl p-3 self-center"><Sparkles size={26} color={colors.green} /></View>
         <Text className="text-2xl font-black text-ink text-center">{pick('Разминка окончена', 'Warm-up complete')}</Text>
         <Text className="text-muted text-center">
           {pick(`Угадано ${correct} из ${cards.length}.`, `Guessed ${correct} of ${cards.length}.`)}
@@ -145,7 +145,7 @@ export default function DailyWords({onDone}: {onDone: () => void}) {
             variant="secondary"
             fullWidth
             disabled={alreadyAdded}
-            icon={alreadyAdded ? <Check size={18} color={colors.plum} /> : <Plus size={18} color={colors.plum} />}
+            icon={alreadyAdded ? <Check size={18} color={colors.green} /> : <Plus size={18} color={colors.green} />}
             label={alreadyAdded ? pick('Добавлено в словарь', 'Added to dictionary') : pick('Добавить это слово в словарь', 'Add this word to my dictionary')}
             onPress={addToDictionary}
           />

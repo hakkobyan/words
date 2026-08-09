@@ -7,14 +7,14 @@ import {useI18n} from '@/lib/i18n';
 import {useThemeColors} from '@/lib/theme';
 
 export function Card({children,className='',style}:{children:React.ReactNode;className?:string;style?:ViewStyle}){
-  return <View style={style} className={`bg-card border border-line rounded-[20px] ${className}`}>{children}</View>;
+  return <View style={style} className={`bg-card border border-line rounded-[22px] ${className}`}>{children}</View>;
 }
 
 type ButtonVariant='default'|'primary'|'secondary'|'danger'|'warning'|'border';
 const buttonStyles:Record<ButtonVariant,{box:string;text:string}>={
   default:{box:'bg-card-strong border border-line',text:'text-ink'},
   primary:{box:'bg-primary-bg border border-primary-bg',text:'text-on-primary'},
-  secondary:{box:'bg-lilac border border-line',text:'text-on-secondary'},
+  secondary:{box:'bg-mint border border-[#d7bda8]',text:'text-on-secondary'},
   danger:{box:'bg-danger border border-danger',text:'text-white'},
   warning:{box:'bg-[#8a5a27] border border-[#8a5a27]',text:'text-white'},
   border:{box:'bg-transparent border border-line',text:'text-ink'},
@@ -23,7 +23,7 @@ export function Button({variant='default',icon,label,onPress,disabled,fullWidth,
   const s=buttonStyles[variant];
   return (
     <Pressable disabled={disabled} onPress={onPress} accessibilityRole="button" accessibilityState={{disabled}}
-      className={`min-h-12 rounded-[14px] px-[18px] flex-row items-center justify-center gap-2 active:opacity-80 ${s.box} ${fullWidth?'w-full':''} ${disabled?'opacity-50':''} ${className}`}>
+      className={`min-h-12 rounded-2xl px-[18px] flex-row items-center justify-center gap-[9px] active:opacity-80 ${s.box} ${fullWidth?'w-full':''} ${disabled?'opacity-50':''} ${className}`}>
       {icon}
       <Text className={`font-bold ${textClassName??s.text}`}>{label}</Text>
     </Pressable>
@@ -31,7 +31,7 @@ export function Button({variant='default',icon,label,onPress,disabled,fullWidth,
 }
 
 export function Pill({children}:{children:React.ReactNode}){
-  return <View className="rounded-full px-3 py-1.5 bg-lilac border border-plum self-start"><Text className="text-[12px] font-extrabold text-plum tracking-wide">{children}</Text></View>;
+  return <View className="rounded-full px-[9px] py-[5px] bg-mint border border-[#d7bda8] self-start"><Text className="text-[12px] font-extrabold text-green tracking-wide">{children}</Text></View>;
 }
 
 export function LanguageSelector({value,onChange}:{value:StudyLanguage;onChange:(v:StudyLanguage)=>void}){
@@ -43,9 +43,9 @@ export function LanguageSelector({value,onChange}:{value:StudyLanguage;onChange:
         const active=value===language;
         return (
           <Pressable key={language} accessibilityRole="tab" accessibilityState={{selected:active}} onPress={()=>onChange(language)}
-            className={`min-h-12 px-4 rounded-xl flex-row items-center justify-center gap-2 flex-1 active:opacity-80 ${active?'bg-card-strong border border-line':'bg-paper-2 border border-paper-2'}`}>
-            <Languages size={17} color={active?colors.plum:colors.muted}/>
-            <Text className={`font-bold text-sm ${active?'text-plum':'text-muted'}`}>{t(language)}</Text>
+            className={`min-h-11 px-4 rounded-xl flex-row items-center justify-center gap-2 flex-1 active:opacity-80 ${active?'bg-card-strong border border-line':'bg-paper-2 border border-paper-2'}`}>
+            <Languages size={17} color={active?colors.green:colors.muted}/>
+            <Text className={`font-bold text-sm ${active?'text-green':'text-muted'}`}>{t(language)}</Text>
           </Pressable>
         );
       })}
@@ -93,7 +93,7 @@ export function Select<T extends string>({value,onChange,options,label}:{value:T
       <Pressable onPress={()=>setOpen(true)} accessibilityRole="button" accessibilityLabel={label} accessibilityValue={{text:current?.label}}
         className="min-h-12 bg-card-strong border border-line rounded-2xl px-4 flex-row items-center justify-between active:opacity-70">
         <Text className="text-ink font-medium flex-1" numberOfLines={1}>{current?.label??''}</Text>
-        <ChevronDown size={18} color={colors.plum}/>
+        <ChevronDown size={18} color={colors.green}/>
       </Pressable>
 
       <Modal visible={open} transparent animationType="fade" statusBarTranslucent onRequestClose={()=>setOpen(false)}>
@@ -118,8 +118,8 @@ export function Select<T extends string>({value,onChange,options,label}:{value:T
                     onPress={()=>choose(option.value)}
                     className={`min-h-14 px-5 flex-row items-center justify-between active:bg-paper-2 ${index?'border-t border-line':''}`}
                   >
-                    <Text className={`text-base flex-1 ${selected?'text-plum font-bold':'text-ink'}`}>{option.label}</Text>
-                    {selected&&<Check size={19} color={colors.plum}/>}
+                    <Text className={`text-base flex-1 ${selected?'text-green font-bold':'text-ink'}`}>{option.label}</Text>
+                    {selected&&<Check size={19} color={colors.green}/>}
                   </Pressable>
                 );
               })}
@@ -135,7 +135,7 @@ export function Empty({title,text}:{title:string;text:string}){
   const colors=useThemeColors();
   return (
     <Card className="p-10 items-center">
-      <View className="bg-lilac rounded-2xl p-4 mb-4"><Leaf size={28} color={colors.plum}/></View>
+      <View className="bg-mint rounded-2xl p-4 mb-4"><Leaf size={28} color={colors.green}/></View>
       <Text className="font-bold text-lg text-ink text-center">{title}</Text>
       <Text className="text-muted mt-2 text-center">{text}</Text>
     </Card>
