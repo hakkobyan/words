@@ -7,7 +7,7 @@ import {useI18n} from '@/lib/i18n';
 import {useThemeColors} from '@/lib/theme';
 
 export function Card({children,className='',style}:{children:React.ReactNode;className?:string;style?:ViewStyle}){
-  return <View style={style} className={`bg-card border border-line rounded-[20px] shadow-sm shadow-[#4c374a12] dark:shadow-none ${className}`}>{children}</View>;
+  return <View style={style} className={`bg-card border border-line rounded-[20px] ${className}`}>{children}</View>;
 }
 
 type ButtonVariant='default'|'primary'|'secondary'|'danger'|'warning'|'border';

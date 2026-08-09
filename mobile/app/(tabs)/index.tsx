@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Link, router } from 'expo-router';
-import { ArrowRight, BookMarked, BookOpen, Flame, Library, Plus, RotateCcw, Sparkles } from 'lucide-react-native';
+import { ArrowRight, BookMarked, BookOpen, Flame, Library, Plus, RotateCcw } from 'lucide-react-native';
 import { useVocabularyStore } from '@/store/useVocabularyStore';
 import { Button, Card, Pill, Progress } from '@/components/ui/Parts';
 import { categoryLabel, useI18n } from '@/lib/i18n';
@@ -48,13 +48,13 @@ export default function Home() {
         <Pill>{s.settings.defaultLanguage === 'english' ? pick('Английский', 'English') : pick('Немецкий', 'German')}</Pill>
       </Pressable>
 
-      <View className="rounded-[28px] p-6 gap-5 overflow-hidden shadow-md shadow-[#5d465b30]" style={{backgroundColor:colors.heroBg}}>
+      <View className="rounded-[24px] p-6 gap-5" style={{backgroundColor:colors.heroBg}}>
         <View className="flex-row items-center justify-between">
-          <View className="flex-row items-center gap-2"><Sparkles size={15} color={colors.heroText}/><Text className="text-xs font-bold tracking-wider" style={{color:colors.heroText,opacity:0.78}}>{pick('ОБЩИЙ ПРОГРЕСС', 'OVERALL PROGRESS')}</Text></View>
+          <Text className="text-xs font-bold tracking-wider" style={{color:colors.heroText,opacity:0.75}}>{pick('ОБЩИЙ ПРОГРЕСС', 'OVERALL PROGRESS')}</Text>
           <Text className="text-4xl font-black" style={{color:colors.heroText}}>{pct}%</Text>
         </View>
         <View>
-          <Text className="text-base font-bold" style={{color:colors.heroText}}>
+          <Text className="text-base font-semibold" style={{color:colors.heroText}}>
             {learned} {pick('из', 'of')} {s.words.length} {pick('слов изучено', 'words learned')}
           </Text>
           <Text className="text-sm mt-1" style={{color:colors.heroText,opacity:0.72}}>{pick('Продолжайте в своём темпе', 'Keep going at your own pace')}</Text>
@@ -62,7 +62,7 @@ export default function Home() {
         <Progress value={pct} onDark />
         <View className="flex-row gap-3 mt-1">
           <Button
-            className="flex-[1.25]"
+            className="flex-1 bg-hero-action-bg border-hero-action-bg"
             textClassName="text-hero-action-text"
             icon={<BookOpen size={19} color={colors.heroActionText} />}
             label={pick('Начать тренировку', 'Start studying')}
@@ -70,8 +70,8 @@ export default function Home() {
           />
           <Button
             variant="border"
-            className="flex-[0.75] border-white/55 bg-white/10"
-            textClassName="text-white"
+            className="flex-1 border-white/70"
+            textClassName="text-hero-text"
             icon={<Plus size={19} color={colors.heroText} />}
             label={pick('Слово', 'Word')}
             onPress={() => router.push('/add')}
