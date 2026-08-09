@@ -49,7 +49,7 @@ export default function RootLayout() {
   const header = {
     headerShown: true,
     headerStyle: { backgroundColor: colors.card },
-    headerTintColor: colors.plum,
+    headerTintColor: colors.green,
     headerTitleStyle: { color: colors.ink, fontWeight: '700' as const },
     headerShadowVisible: false,
   };

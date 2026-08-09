@@ -38,8 +38,8 @@ function CustomTabBar({ state, navigation }: { state: { routes: { key: string; n
         style={{
           flexDirection: 'row',
           justifyContent: 'space-around',
-          paddingHorizontal: 8,
-          paddingTop: 9,
+          paddingHorizontal: 4,
+          paddingTop: 8,
           // Carries the bar's surface through the home-indicator area, so the
           // strip below it reads as part of the menu rather than the page.
           paddingBottom: insets.bottom + 8,
@@ -57,12 +57,12 @@ function CustomTabBar({ state, navigation }: { state: { routes: { key: string; n
             accessibilityLabel={tabLabel(route.name, t)}
             accessibilityState={{selected:isFocused}}
             onPress={() => navigation.navigate(route.name)}
-            className="min-h-14 flex-1 items-center justify-center gap-1 py-1"
+            className="flex-1 items-center gap-1 py-1"
           >
-            <View className={isAdd?'bg-primary-bg rounded-[18px] w-14 h-14 -mt-7 items-center justify-center':isFocused?'bg-lilac rounded-xl w-12 h-8 items-center justify-center':'w-12 h-8 items-center justify-center'} style={isAdd?{elevation:4}:undefined}>
-              <Icon size={isAdd?24:20} strokeWidth={isFocused?2.4:1.8} color={isAdd?colors.onPrimary:isFocused?colors.plum:colors.muted}/>
+            <View className={isAdd?'bg-primary-bg rounded-2xl p-3 -mt-7':''} style={isAdd?{elevation:4}:undefined}>
+              <Icon size={isAdd?25:20} color={isAdd?colors.onPrimary:isFocused?colors.green:colors.muted}/>
             </View>
-            <Text style={{color:isFocused?colors.plum:colors.muted,fontWeight:isFocused?'700':'500',fontSize:11}}>
+            <Text style={{color:isFocused?colors.green:colors.muted,fontWeight:isFocused?'700':'400',fontSize:10}}>
               {tabLabel(route.name, t)}
             </Text>
           </Pressable>
@@ -109,8 +109,8 @@ export default function TabsLayout() {
         accessibilityLabel="Ещё"
         onPress={() => router.push('/settings')}
         {...dataSet({ safeTopOffset: 'true' })}
-        className="absolute right-5 w-12 h-12 items-center justify-center rounded-full bg-card border border-line"
-        style={{ top: insets.top + 12, zIndex: 20, elevation: 6 }}
+        className="absolute right-4 rounded-full p-2.5 bg-card border border-line"
+        style={{ top: insets.top + 12, zIndex: 20 }}
       >
         <Menu size={20} color={colors.muted} />
       </Pressable>

@@ -1,7 +1,7 @@
 import {useColorScheme} from 'nativewind';
 
-const light={ink:'#241c18',muted:'#75655c',paper:'#f6efe7',paper2:'#ede3d8',card:'#fffcf8',cardStrong:'#ffffff',plum:'#66566f',lilac:'#ede5ef',orange:'#c97852',line:'#ded0c4',danger:'#a23f36',success:'#5f617a',placeholder:'#76655c',onPrimary:'#fffaf4',heroBg:'#754a3a',heroText:'#fffaf4',heroActionBg:'#fffaf3',heroActionText:'#4f3026'};
-const dark={ink:'#f7f1eb',muted:'#bdaea5',paper:'#171412',paper2:'#24201d',card:'#29231f',cardStrong:'#332b26',plum:'#c8b2cf',lilac:'#3d3040',orange:'#e09a75',line:'#493e37',danger:'#ef8f85',success:'#bec0da',placeholder:'#bca79b',onPrimary:'#221713',heroBg:'#704536',heroText:'#fffaf4',heroActionBg:'#fffaf3',heroActionText:'#4f3026'};
+const light={ink:'#291f1a',muted:'#6f5f56',paper:'#efe5d8',paper2:'#e4d5c5',card:'#fffaf3',cardStrong:'#ffffff',green:'#704838',mint:'#ead6c4',orange:'#b8683e',line:'#d8c5b4',danger:'#a23f36',success:'#47654c',placeholder:'#76655c',onPrimary:'#fffaf4',heroBg:'#704838',heroText:'#fffaf4',heroActionBg:'#fffaf3',heroActionText:'#4f3026'};
+const dark={ink:'#f7eee6',muted:'#c7b3a5',paper:'#1d1714',paper2:'#2a211c',card:'#2d231e',cardStrong:'#352923',green:'#deb39a',mint:'#4b352a',orange:'#dc956d',line:'#5b4539',danger:'#ef8f85',success:'#9fc0a4',placeholder:'#bca79b',onPrimary:'#211713',heroBg:'#704838',heroText:'#fffaf4',heroActionBg:'#fffaf3',heroActionText:'#4f3026'};
 
 export function useThemeColors(){
   const {colorScheme}=useColorScheme();

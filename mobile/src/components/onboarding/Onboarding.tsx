@@ -72,7 +72,7 @@ export default function Onboarding() {
         <Card className="p-6 gap-5 rounded-[28px]">
           {step === 'welcome' && (
             <>
-              <View className="bg-lilac rounded-[20px] p-3.5 self-start"><Sparkles size={28} color={colors.plum} /></View>
+              <View className="bg-mint rounded-[20px] p-3.5 self-start"><Sparkles size={28} color={colors.green} /></View>
               <View className="gap-2">
                 <Text className="text-[34px] leading-[40px] font-black text-ink">{pick('Учите слова без зубрёжки', 'Learn words without cramming')}</Text>
                 <Text className="text-muted text-base leading-6">{pick('Соберём личный словарь и подберём короткие тренировки под ваш уровень.', 'Build a personal vocabulary and get short sessions matched to your level.')}</Text>
@@ -91,8 +91,8 @@ export default function Onboarding() {
               <Text className="text-2xl font-black text-ink">{pick('Ваш уровень', 'Your level')}</Text>
               <Text className="text-muted">{pick('Как определим ваш уровень владения языком?', 'How should we work out your level?')}</Text>
               <Pressable onPress={() => setStep('test')} accessibilityRole="button"
-                className="bg-lilac border border-line rounded-2xl p-5 flex-row items-center gap-3">
-                <ClipboardList size={22} color={colors.plum} />
+                className="bg-mint border border-line rounded-2xl p-5 flex-row items-center gap-3">
+                <ClipboardList size={22} color={colors.green} />
                 <View className="flex-1">
                   <Text className="font-bold text-on-secondary">{pick('Пройти тест', 'Take a test')}</Text>
                   <Text className="text-muted text-sm">{pick('20 слов разных уровней — переведите их', '20 words of different levels — translate them')}</Text>
@@ -100,7 +100,7 @@ export default function Onboarding() {
               </Pressable>
               <Pressable onPress={() => setStep('manual')} accessibilityRole="button"
                 className="border border-line rounded-2xl p-5 flex-row items-center gap-3">
-                <Sparkles size={22} color={colors.plum} />
+                <Sparkles size={22} color={colors.green} />
                 <View className="flex-1">
                   <Text className="font-bold text-ink">{pick('Указать самому', 'Set it myself')}</Text>
                   <Text className="text-muted text-sm">{pick('Я знаю свой уровень CEFR', 'I already know my CEFR level')}</Text>
@@ -154,9 +154,9 @@ export default function Onboarding() {
 
           {step === 'result' && (
             <>
-              <View className="bg-lilac rounded-2xl p-3 self-center"><Sparkles size={26} color={colors.plum} /></View>
+              <View className="bg-mint rounded-2xl p-3 self-center"><Sparkles size={26} color={colors.green} /></View>
               <Text className="text-2xl font-black text-ink text-center">{pick('Ваш уровень', 'Your level')}</Text>
-              <Text className="text-5xl font-black text-plum text-center">{resultLevel}</Text>
+              <Text className="text-5xl font-black text-green text-center">{resultLevel}</Text>
               <Text className="text-muted text-center">
                 {pick(`Правильно: ${score} из ${words.length}. `, `Correct: ${score} of ${words.length}. `)}
                 {pick(...levelHints[resultLevel])}
