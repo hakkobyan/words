@@ -49,8 +49,6 @@ export default function Home() {
       </Pressable>
 
       <View className="rounded-[28px] p-6 gap-5 overflow-hidden shadow-md shadow-[#5d465b30]" style={{backgroundColor:colors.heroBg}}>
-        <View className="absolute -right-12 -top-16 w-44 h-44 rounded-full bg-orange opacity-20" />
-        <View className="absolute -left-14 -bottom-20 w-48 h-48 rounded-full bg-lilac opacity-10" />
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center gap-2"><Sparkles size={15} color={colors.heroText}/><Text className="text-xs font-bold tracking-wider" style={{color:colors.heroText,opacity:0.78}}>{pick('ОБЩИЙ ПРОГРЕСС', 'OVERALL PROGRESS')}</Text></View>
           <Text className="text-4xl font-black" style={{color:colors.heroText}}>{pct}%</Text>
