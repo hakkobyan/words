@@ -1,10 +1,73 @@
 export type WordHuntTarget={
-  id:string;word:string;translationRu:string;partOfSpeech:string;level:'B2'|'C1';definition:string;pronunciation:string;example:string;
+  id:string;word:string;translationRu:string;partOfSpeech:string;level:'A1'|'A2'|'B1'|'B2'|'C1';definition:string;pronunciation:string;example:string;
   related:string[];neighbors:Record<string,number>;hints:[string,string,string];categoryId:string;
   practice:{question:string;options:string[];correctIndex:number;explanation:string};
 };
 
 export const WORD_HUNT_TARGETS:WordHuntTarget[]=[
+  {
+    id:'family',word:'family',translationRu:'семья',partOfSpeech:'noun',level:'A1',pronunciation:'/ˈfæməli/',categoryId:'family',
+    definition:'A group of people who are related to each other.',example:'My family eats dinner together every Sunday.',related:['mother','father','parents','children'],
+    neighbors:{parents:8,mother:15,father:18,children:22,home:48,relative:31,people:95,friend:180,office:1200},
+    hints:['This is a noun.','It includes parents, children, and relatives.','Starts with “f”.'],
+    practice:{question:'Which sentence uses “family” correctly?',options:['My family lives nearby.','She family the window.','The soup tastes family.'],correctIndex:0,explanation:'“Family” is a noun for people who are related to one another.'},
+  },
+  {
+    id:'happy',word:'happy',translationRu:'счастливый',partOfSpeech:'adjective',level:'A1',pronunciation:'/ˈhæpi/',categoryId:'emotions',
+    definition:'Feeling or showing pleasure or joy.',example:'She felt happy after hearing the good news.',related:['glad','pleased','smile','joy'],
+    neighbors:{glad:7,pleased:14,joy:21,smile:34,cheerful:27,good:88,sad:920,angry:1100},
+    hints:['This is an adjective.','It describes a positive feeling.','Starts with “h”.'],
+    practice:{question:'Which sentence uses “happy” correctly?',options:['They were happy to see us.','He happy the book.','The happy ran quickly.'],correctIndex:0,explanation:'“Happy” is an adjective describing a feeling of joy.'},
+  },
+  {
+    id:'listen',word:'listen',translationRu:'слушать',partOfSpeech:'verb',level:'A1',pronunciation:'/ˈlɪsən/',categoryId:'verbs',
+    definition:'To pay attention to a sound or to someone speaking.',example:'Please listen carefully to the instructions.',related:['hear','sound','music','attention'],
+    neighbors:{hear:11,sound:29,music:38,attention:17,speak:66,voice:72,ignore:940,write:1300},
+    hints:['This is a verb.','You do this with your ears.','Starts with “l”.'],
+    practice:{question:'Which sentence uses “listen” correctly?',options:['Listen to this song.','The listen chair is blue.','She is a listen.'],correctIndex:0,explanation:'“Listen” is a verb meaning to pay attention to sound.'},
+  },
+  {
+    id:'borrow',word:'borrow',translationRu:'брать взаймы',partOfSpeech:'verb',level:'A2',pronunciation:'/ˈbɒrəʊ/',categoryId:'verbs',
+    definition:'To take and use something that belongs to someone else, then return it.',example:'Can I borrow your pen for a minute?',related:['lend','take','return','loan'],
+    neighbors:{lend:9,loan:17,take:42,return:25,use:91,give:118,keep:760,buy:980},
+    hints:['This is a verb.','You take something temporarily and return it later.','Starts with “b”.'],
+    practice:{question:'Which sentence uses “borrow” correctly?',options:['May I borrow your umbrella?','She borrowed me her car.','The borrow was delicious.'],correctIndex:0,explanation:'You borrow something from someone and return it later.'},
+  },
+  {
+    id:'quietly',word:'quietly',translationRu:'тихо',partOfSpeech:'adverb',level:'A2',pronunciation:'/ˈkwaɪətli/',categoryId:'other',
+    definition:'In a way that makes little or no noise.',example:'The children entered the room quietly.',related:['silently','softly','calmly','gently'],
+    neighbors:{silently:8,softly:16,calmly:33,gently:29,slowly:74,loudly:930,noisy:1180},
+    hints:['This is an adverb.','It describes doing something with little noise.','Starts with “q”.'],
+    practice:{question:'Which sentence uses “quietly” correctly?',options:['He closed the door quietly.','It was a quietly room.','Quietly is my favourite chair.'],correctIndex:0,explanation:'“Quietly” is an adverb describing how an action is done.'},
+  },
+  {
+    id:'journey',word:'journey',translationRu:'путешествие',partOfSpeech:'noun',level:'A2',pronunciation:'/ˈdʒɜːni/',categoryId:'travel',
+    definition:'An act of travelling from one place to another.',example:'The train journey took three hours.',related:['trip','travel','route','destination'],
+    neighbors:{trip:7,travel:13,route:31,destination:38,voyage:22,train:86,stay:810,home:1050},
+    hints:['This is a noun.','It is the experience of travelling from one place to another.','Starts with “j”.'],
+    practice:{question:'Which sentence uses “journey” correctly?',options:['The journey across the mountains was long.','We journey the blue bag.','She feels very journey.'],correctIndex:0,explanation:'“Journey” is a noun for travel from one place to another.'},
+  },
+  {
+    id:'achieve',word:'achieve',translationRu:'достигать',partOfSpeech:'verb',level:'B1',pronunciation:'/əˈtʃiːv/',categoryId:'verbs',
+    definition:'To succeed in reaching a goal through effort.',example:'She worked hard to achieve her goal.',related:['accomplish','succeed','reach','attain'],
+    neighbors:{accomplish:6,succeed:15,reach:24,attain:9,goal:42,complete:58,fail:910,lose:1200},
+    hints:['This is a verb.','It means to successfully reach a goal.','Starts with “a”.'],
+    practice:{question:'Which sentence uses “achieve” correctly?',options:['They achieved excellent results.','The achieve was on the shelf.','She is very achieve.'],correctIndex:0,explanation:'“Achieve” is a verb meaning to reach a desired result.'},
+  },
+  {
+    id:'confident',word:'confident',translationRu:'уверенный',partOfSpeech:'adjective',level:'B1',pronunciation:'/ˈkɒnfɪdənt/',categoryId:'emotions',
+    definition:'Feeling sure about your abilities or decisions.',example:'He felt confident before the interview.',related:['sure','positive','secure','self-assured'],
+    neighbors:{sure:12,secure:27,positive:44,'self-assured':8,brave:69,calm:91,uncertain:880,nervous:1040},
+    hints:['This is an adjective.','It describes someone who believes in their ability.','Starts with “c”.'],
+    practice:{question:'Which sentence uses “confident” correctly?',options:['She is confident about the exam.','He confident the answer.','The confident is under the table.'],correctIndex:0,explanation:'“Confident” describes feeling sure about yourself or a result.'},
+  },
+  {
+    id:'opportunity',word:'opportunity',translationRu:'возможность',partOfSpeech:'noun',level:'B1',pronunciation:'/ˌɒpəˈtjuːnəti/',categoryId:'other',
+    definition:'A situation that makes it possible to do something useful or desirable.',example:'This course is a great opportunity to improve your English.',related:['chance','possibility','occasion','opening'],
+    neighbors:{chance:7,possibility:18,opening:29,occasion:46,option:61,future:105,problem:870,barrier:1120},
+    hints:['This is a noun.','It means a good chance to do something.','Starts with “o”.'],
+    practice:{question:'Which sentence uses “opportunity” correctly?',options:['The job is a valuable opportunity.','She opportunity the letter.','The opportunity soup was hot.'],correctIndex:0,explanation:'“Opportunity” is a noun for a favourable chance to do something.'},
+  },
   {
     id:'resilient',word:'resilient',translationRu:'жизнестойкий',partOfSpeech:'adjective',level:'C1',pronunciation:'/rɪˈzɪliənt/',categoryId:'adjectives',
     definition:'Able to recover quickly from difficulties.',example:'She remained resilient after a difficult year.',related:['strong','tough','persistent','determined'],
@@ -42,9 +105,11 @@ export const WORD_HUNT_TARGETS:WordHuntTarget[]=[
   },
 ];
 
-export const getDailyHuntTargets=(level:'mixed'|'B2'|'C1'='mixed',date=new Date())=>{
+export const getDailyHuntTargets=(level:WordHuntLevel='mixed',date=new Date())=>{
   const pool=level==='mixed'?WORD_HUNT_TARGETS:WORD_HUNT_TARGETS.filter(target=>target.level===level);
   const day=Math.floor(Date.UTC(date.getUTCFullYear(),date.getUTCMonth(),date.getUTCDate())/86400000);
   const offset=day%pool.length;
-  return [...pool.slice(offset),...pool.slice(0,offset)];
+  const rotated=[...pool.slice(offset),...pool.slice(0,offset)];
+  return level==='mixed'?rotated.slice(0,5):rotated;
 };
+import {WordHuntLevel} from '@/types';

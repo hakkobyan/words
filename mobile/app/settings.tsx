@@ -179,7 +179,10 @@ export default function Settings() {
             value={store.settings.wordHuntLevel}
             onChange={(v: WordHuntLevel) => store.setSettings({ wordHuntLevel: v })}
             options={[
-              { value: 'mixed' as WordHuntLevel, label: pick('Смешанный · B2 и C1', 'Mixed · B2 and C1') },
+              { value: 'mixed' as WordHuntLevel, label: pick('Все уровни · A1–C1', 'All levels · A1–C1') },
+              { value: 'A1' as WordHuntLevel, label: 'A1' },
+              { value: 'A2' as WordHuntLevel, label: 'A2' },
+              { value: 'B1' as WordHuntLevel, label: 'B1' },
               { value: 'B2' as WordHuntLevel, label: 'B2' },
               { value: 'C1' as WordHuntLevel, label: 'C1' },
             ]}
