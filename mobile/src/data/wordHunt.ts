@@ -1,3 +1,5 @@
+import {WordHuntLevel} from '@/types';
+
 export type WordHuntTarget={
   id:string;word:string;translationRu:string;partOfSpeech:string;level:'A1'|'A2'|'B1'|'B2'|'C1';definition:string;pronunciation:string;example:string;
   related:string[];neighbors:Record<string,number>;hints:[string,string,string];categoryId:string;
@@ -105,11 +107,35 @@ export const WORD_HUNT_TARGETS:WordHuntTarget[]=[
   },
 ];
 
+function nounTarget(id:string,translationRu:string,level:Exclude<WordHuntLevel,'mixed'>,definition:string,example:string,related:[string,string,string,string],categoryId='other'):WordHuntTarget{
+  const neighbors=Object.fromEntries(related.map((word,index)=>[word,[9,18,31,47][index]]));
+  return {
+    id,word:id,translationRu,partOfSpeech:'noun',level,pronunciation:'',categoryId,definition,example,related,neighbors:{...neighbors,thing:820,action:1260},
+    hints:['This is a noun.',definition,`Starts with “${id[0]}”.`],
+    practice:{question:`Which sentence uses “${id}” correctly?`,options:[example,`She ${id} the report yesterday.`,`They felt very ${id}.`],correctIndex:0,explanation:`“${id}” is used here as a noun.`},
+  };
+}
+
+const EXTRA_NOUN_TARGETS:WordHuntTarget[]=[
+  nounTarget('weather','погода','A1','The condition of the air outside, such as sun, rain, or wind.','The weather is warm and sunny today.',['rain','sun','wind','climate'],'nature'),
+  nounTarget('village','деревня','A1','A small group of houses in the countryside.','Her family lives in a quiet village.',['town','countryside','community','home'],'home'),
+  nounTarget('customer','клиент','A2','A person who buys goods or services.','The customer asked for a receipt.',['buyer','shopper','client','consumer'],'work'),
+  nounTarget('luggage','багаж','A2','The bags and cases you take when travelling.','Our luggage is already on the train.',['bag','suitcase','baggage','travel'],'travel'),
+  nounTarget('advice','совет','B1','An opinion about what someone should do.','Her advice helped me make a better choice.',['guidance','suggestion','recommendation','help'],'other'),
+  nounTarget('decision','решение','B1','A choice made after thinking about several possibilities.','It was a difficult decision for the whole team.',['choice','judgment','conclusion','option'],'work'),
+  nounTarget('evidence','доказательство','B2','Facts or information showing that something is true.','The report provides strong evidence for the claim.',['proof','fact','indication','testimony'],'school'),
+  nounTarget('assumption','предположение','B2','Something accepted as true without definite proof.','The plan was based on a false assumption.',['belief','presumption','idea','expectation'],'school'),
+  nounTarget('perspective','точка зрения','C1','A particular way of considering or understanding something.','The discussion gave us a different perspective.',['viewpoint','outlook','angle','standpoint'],'school'),
+  nounTarget('resilience','жизнестойкость','C1','The ability to recover quickly from difficulty or change.','Her resilience helped her overcome the setback.',['strength','recovery','endurance','adaptability'],'emotions'),
+  nounTarget('implication','последствие, подтекст','C1','A possible effect or meaning that is suggested rather than stated.','We discussed the wider implication of the decision.',['consequence','meaning','effect','suggestion'],'other'),
+];
+
+const NOUN_HUNT_TARGETS=[...WORD_HUNT_TARGETS.filter(target=>target.partOfSpeech==='noun'),...EXTRA_NOUN_TARGETS];
+
 export const getDailyHuntTargets=(level:WordHuntLevel='mixed',date=new Date())=>{
-  const pool=level==='mixed'?WORD_HUNT_TARGETS:WORD_HUNT_TARGETS.filter(target=>target.level===level);
+  const pool=level==='mixed'?NOUN_HUNT_TARGETS:NOUN_HUNT_TARGETS.filter(target=>target.level===level);
   const day=Math.floor(Date.UTC(date.getUTCFullYear(),date.getUTCMonth(),date.getUTCDate())/86400000);
   const offset=day%pool.length;
   const rotated=[...pool.slice(offset),...pool.slice(0,offset)];
   return level==='mixed'?rotated.slice(0,5):rotated;
 };
-import {WordHuntLevel} from '@/types';
