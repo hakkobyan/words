@@ -38,7 +38,7 @@ export default function Home() {
   return (
     <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="w-full max-w-[720px] self-center px-5 pt-6 gap-6 pb-28">
       <View className="pr-14 gap-1">
-        <Text className="text-green text-xs font-black tracking-wider mb-1">{pick('ВАШ СЛОВАРЬ', 'YOUR VOCABULARY')}</Text>
+        <Text className="text-plum text-xs font-black tracking-wider mb-1">{pick('ВАШ СЛОВАРЬ', 'YOUR VOCABULARY')}</Text>
         <Text className="text-[32px] leading-[38px] font-black text-ink tracking-tight">
           {pick('Продолжим учиться?', 'Ready to keep learning?')}
         </Text>
@@ -83,7 +83,7 @@ export default function Home() {
         {stats.map((stat,index)=>{
           const Icon='icon' in stat?stat.icon:null;
           return <View key={stat.label} className={`flex-1 items-center py-3 px-1 ${index?'border-l border-line':''}`}>
-            <View className="h-6 justify-center">{Icon?<Icon size={17} color={colors.green}/>:<Text className="text-green text-xs font-black">{'code' in stat?stat.code:''}</Text>}</View>
+            <View className="h-6 justify-center">{Icon?<Icon size={17} color={colors.plum}/>:<Text className="text-plum text-xs font-black">{'code' in stat?stat.code:''}</Text>}</View>
             <Text className="text-xl font-black text-ink">{stat.value}</Text>
             <Text className="text-muted text-[11px] text-center" numberOfLines={1}>{stat.label}</Text>
           </View>;
@@ -96,14 +96,14 @@ export default function Home() {
             <Text className="text-xl font-bold text-ink">{pick('Сегодня на повторение', 'Review today')}</Text>
             <Link href="/study" asChild>
               <Pressable>
-                <Text className="text-green font-bold">{pick('Все режимы', 'All modes')}</Text>
+                <Text className="text-plum font-bold">{pick('Все режимы', 'All modes')}</Text>
               </Pressable>
             </Link>
           </View>
           <Pressable onPress={() => router.push('/study/flashcards')}>
             <Card className="p-6 flex-row gap-5 items-center">
-              <View className="bg-mint rounded-2xl p-4">
-                <RotateCcw color={colors.green} />
+              <View className="bg-lilac rounded-2xl p-4">
+                <RotateCcw color={colors.plum} />
               </View>
               <View className="flex-1">
                 <Text className="text-lg font-bold text-ink">
@@ -146,7 +146,7 @@ export default function Home() {
           <Text className="text-xl font-bold text-ink">{pick('Популярные категории', 'Popular categories')}</Text>
           <Link href="/categories" asChild>
             <Pressable>
-              <Text className="text-green font-bold">{pick('Все', 'All')}</Text>
+              <Text className="text-plum font-bold">{pick('Все', 'All')}</Text>
             </Pressable>
           </Link>
         </View>
@@ -158,7 +158,7 @@ export default function Home() {
               <Link href={`/categories/${c.id}`} key={c.id} asChild>
                 <Pressable style={{ flexBasis: '47%', flexGrow: 1 }}>
                   <Card className="p-4">
-                    <View className="w-10 h-10 rounded-xl bg-mint items-center justify-center"><BookMarked size={20} color={colors.green}/></View>
+                    <View className="w-10 h-10 rounded-xl bg-lilac items-center justify-center"><BookMarked size={20} color={colors.plum}/></View>
                     <Text className="font-bold text-ink mt-3">{categoryLabel(c.id, c.name, locale)}</Text>
                     <Text className="text-muted text-xs mb-3">
                       {ws.length} {pick('слов', 'words')} · {p}%

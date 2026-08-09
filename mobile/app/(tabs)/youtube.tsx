@@ -40,7 +40,7 @@ function FilterChip({ label, checked, onToggle }: { label: string; checked: bool
       accessibilityState={{ checked }}
       className="min-h-12 rounded-2xl px-4 flex-row items-center gap-3 bg-card-strong border border-line"
     >
-      <View className="w-5 h-5 rounded-[6px] items-center justify-center border" style={{ borderColor: colors.line, backgroundColor: checked ? colors.green : 'transparent' }}>
+      <View className="w-5 h-5 rounded-[6px] items-center justify-center border" style={{ borderColor: colors.line, backgroundColor: checked ? colors.plum : 'transparent' }}>
         {checked && <Check size={14} color={colors.paper} />}
       </View>
       <Text className="text-ink flex-1">{label}</Text>
@@ -220,8 +220,8 @@ export default function YouTubeVocabulary() {
 
       {state === 'error' && (
         <Card className="p-7 items-center">
-          <View className="bg-mint p-4 rounded-2xl mb-4">
-            <Captions size={28} color={colors.green} />
+          <View className="bg-lilac p-4 rounded-2xl mb-4">
+            <Captions size={28} color={colors.plum} />
           </View>
           <Text className="text-xl font-black text-ink text-center">{activeError.title}</Text>
           <Text className="text-muted mt-2 text-center">{activeError.text}</Text>
@@ -242,8 +242,8 @@ export default function YouTubeVocabulary() {
         <>
           <Card className="p-5 gap-4">
             <View className="flex-row gap-4 items-center">
-              <View className="bg-mint rounded-2xl p-4">
-                <Video size={27} color={colors.green} />
+              <View className="bg-lilac rounded-2xl p-4">
+                <Video size={27} color={colors.plum} />
               </View>
               <View className="flex-1 min-w-0">
                 <Text className="text-muted text-sm">Video analyzed</Text>
@@ -258,7 +258,7 @@ export default function YouTubeVocabulary() {
                 <Text className="text-muted text-sm mt-1">{analysis.transcriptWordCount.toLocaleString()} subtitle words processed</Text>
               </View>
             </View>
-            <Button variant="secondary" icon={<Play size={18} color={colors.green} />} label="Open video" onPress={() => Linking.openURL(analysis.video.url)} />
+            <Button variant="secondary" icon={<Play size={18} color={colors.plum} />} label="Open video" onPress={() => Linking.openURL(analysis.video.url)} />
             <View className="flex-row flex-wrap gap-3 pt-3 border-t border-line">
               {[
                 [Clock3, formatDuration(analysis.video.durationSeconds) || '—', 'Duration'],
@@ -291,7 +291,7 @@ export default function YouTubeVocabulary() {
             <View className="flex-row gap-3">
               <Button
                 variant="secondary"
-                icon={<Plus size={18} color={colors.green} />}
+                icon={<Plus size={18} color={colors.plum} />}
                 label={`Add selected (${selectedItems.length})`}
                 onPress={() => addItems(selectedItems)}
                 disabled={!selectedItems.length}

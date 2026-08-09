@@ -59,10 +59,10 @@ function CustomTabBar({ state, navigation }: { state: { routes: { key: string; n
             onPress={() => navigation.navigate(route.name)}
             className="min-h-14 flex-1 items-center justify-center gap-1 py-1"
           >
-            <View className={isAdd?'bg-primary-bg rounded-[18px] w-14 h-14 -mt-7 items-center justify-center':isFocused?'bg-mint rounded-xl w-12 h-8 items-center justify-center':'w-12 h-8 items-center justify-center'} style={isAdd?{elevation:4}:undefined}>
-              <Icon size={isAdd?24:20} strokeWidth={isFocused?2.4:1.8} color={isAdd?colors.onPrimary:isFocused?colors.green:colors.muted}/>
+            <View className={isAdd?'bg-primary-bg rounded-[18px] w-14 h-14 -mt-7 items-center justify-center':isFocused?'bg-lilac rounded-xl w-12 h-8 items-center justify-center':'w-12 h-8 items-center justify-center'} style={isAdd?{elevation:4}:undefined}>
+              <Icon size={isAdd?24:20} strokeWidth={isFocused?2.4:1.8} color={isAdd?colors.onPrimary:isFocused?colors.plum:colors.muted}/>
             </View>
-            <Text style={{color:isFocused?colors.green:colors.muted,fontWeight:isFocused?'700':'500',fontSize:11}}>
+            <Text style={{color:isFocused?colors.plum:colors.muted,fontWeight:isFocused?'700':'500',fontSize:11}}>
               {tabLabel(route.name, t)}
             </Text>
           </Pressable>

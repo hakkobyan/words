@@ -213,7 +213,7 @@ export default function Settings() {
             <Switch
               value={store.settings[key]}
               onValueChange={(v) => store.setSettings({ [key]: v })}
-              trackColor={{ false: colors.line, true: colors.green }}
+              trackColor={{ false: colors.line, true: colors.plum }}
               thumbColor={colors.cardStrong}
             />
           </View>
@@ -223,8 +223,8 @@ export default function Settings() {
       <Card className="p-5 gap-4">
         <Text className="font-bold text-lg text-ink">{pick('Мои данные', 'My data')}</Text>
         <View className="gap-3">
-          <Button variant="secondary" icon={<Download size={18} color={colors.green} />} label={pick('Экспорт JSON', 'Export JSON')} onPress={exportData} fullWidth />
-          <Button variant="secondary" icon={<Upload size={18} color={colors.green} />} label={pick('Импорт JSON', 'Import JSON')} onPress={importData} fullWidth />
+          <Button variant="secondary" icon={<Download size={18} color={colors.plum} />} label={pick('Экспорт JSON', 'Export JSON')} onPress={exportData} fullWidth />
+          <Button variant="secondary" icon={<Upload size={18} color={colors.plum} />} label={pick('Импорт JSON', 'Import JSON')} onPress={importData} fullWidth />
           <Button variant="border" icon={<RotateCcw size={18} color={colors.ink} />} label={pick('Сбросить прогресс', 'Reset progress')} onPress={confirmReset} fullWidth />
           <Button variant="danger" icon={<Trash2 size={18} color="#fff" />} label={pick('Удалить все данные', 'Delete all data')} onPress={confirmClear} fullWidth />
         </View>
