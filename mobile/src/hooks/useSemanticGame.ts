@@ -13,8 +13,8 @@ export function useSemanticGame(){
   const targets=getDailyHuntTargets(level);
   const targetIds=new Set(targets.map(item=>item.id));
   const completedToday=progress.date===new Date().toISOString().slice(0,10)?progress.completedIds.filter(id=>targetIds.has(id)):[];
-  const currentIndex=Math.min(completedToday.length,targets.length-1);
-  const target=targets[currentIndex];
+  const completedSet=new Set(completedToday);
+  const target=targets.find(item=>!completedSet.has(item.id))??targets[targets.length-1];
   const [guess,setGuess]=useState('');
   const [guesses,setGuesses]=useState<SemanticGuess[]>([]);
   const [status,setStatus]=useState<GameStatus>('playing');
