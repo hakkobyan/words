@@ -91,7 +91,7 @@ export default function Onboarding() {
               <Text className="text-2xl font-black text-ink">{pick('Ваш уровень', 'Your level')}</Text>
               <Text className="text-muted">{pick('Как определим ваш уровень владения языком?', 'How should we work out your level?')}</Text>
               <Pressable onPress={() => setStep('test')} accessibilityRole="button"
-                className="bg-mint border border-[#d7bda8] rounded-2xl p-5 flex-row items-center gap-3">
+                className="bg-mint border border-line rounded-2xl p-5 flex-row items-center gap-3">
                 <ClipboardList size={22} color={colors.green} />
                 <View className="flex-1">
                   <Text className="font-bold text-on-secondary">{pick('Пройти тест', 'Take a test')}</Text>

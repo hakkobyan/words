@@ -157,7 +157,7 @@ export default function DailyWords({onDone}: {onDone: () => void}) {
         <View className="flex-1">
           {verdict === 'none'
             ? <Button fullWidth variant="primary" label={pick('Проверить', 'Check')} onPress={check} />
-            : <Button fullWidth variant="primary" icon={<ArrowRight size={18} color="#fffaf4" />} label={pick('Дальше', 'Next')} onPress={next} />}
+            : <Button fullWidth variant="primary" icon={<ArrowRight size={18} color={colors.onPrimary} />} label={pick('Дальше', 'Next')} onPress={next} />}
         </View>
       </View>
     </Shell>

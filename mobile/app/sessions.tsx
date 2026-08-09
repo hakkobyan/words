@@ -28,7 +28,7 @@ export default function Sessions() {
         </View>
         <Button
           variant="primary"
-          icon={<Plus size={18} color="#fffaf4" />}
+          icon={<Plus size={18} color={colors.onPrimary} />}
           label="Создать"
           onPress={() => {
             s.addSession(name || `${lang === 'english' ? 'Английский' : 'Немецкий'} — ${new Date().toLocaleString('ru')}`, lang);

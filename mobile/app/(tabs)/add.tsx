@@ -184,7 +184,7 @@ export default function Add() {
 
         <View className="gap-3">
           <Button variant="secondary" icon={<Check size={18} color={colors.green} />} label={pick('Добавить слово', 'Add word')} onPress={() => save(false)} fullWidth />
-          <Button variant="primary" icon={<Plus size={18} color="#fffaf4" />} label={pick('Добавить и продолжить', 'Add and continue')} onPress={() => save(true)} fullWidth />
+          <Button variant="primary" icon={<Plus size={18} color={colors.onPrimary} />} label={pick('Добавить и продолжить', 'Add and continue')} onPress={() => save(true)} fullWidth />
         </View>
       </Card>
     </ScrollView>

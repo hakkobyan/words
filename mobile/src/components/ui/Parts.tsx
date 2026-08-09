@@ -14,7 +14,7 @@ type ButtonVariant='default'|'primary'|'secondary'|'danger'|'warning'|'border';
 const buttonStyles:Record<ButtonVariant,{box:string;text:string}>={
   default:{box:'bg-card-strong border border-line',text:'text-ink'},
   primary:{box:'bg-primary-bg border border-primary-bg',text:'text-on-primary'},
-  secondary:{box:'bg-mint border border-[#d7bda8]',text:'text-on-secondary'},
+  secondary:{box:'bg-mint border border-line',text:'text-on-secondary'},
   danger:{box:'bg-danger border border-danger',text:'text-white'},
   warning:{box:'bg-[#8a5a27] border border-[#8a5a27]',text:'text-white'},
   border:{box:'bg-transparent border border-line',text:'text-ink'},
@@ -31,7 +31,7 @@ export function Button({variant='default',icon,label,onPress,disabled,fullWidth,
 }
 
 export function Pill({children}:{children:React.ReactNode}){
-  return <View className="rounded-full px-3 py-1.5 bg-mint border border-line self-start"><Text className="text-[12px] font-extrabold text-green tracking-wide">{children}</Text></View>;
+  return <View className="rounded-full px-3 py-1.5 bg-mint border border-green self-start"><Text className="text-[12px] font-extrabold text-green tracking-wide">{children}</Text></View>;
 }
 
 export function LanguageSelector({value,onChange}:{value:StudyLanguage;onChange:(v:StudyLanguage)=>void}){
