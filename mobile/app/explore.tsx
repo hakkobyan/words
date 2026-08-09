@@ -30,13 +30,13 @@ export default function Explore(){
   useEffect(()=>{scrollRef.current?.scrollTo({y:0,animated:true})},[game.status]);
 
   return <KeyboardAvoidingView className="flex-1 bg-paper" behavior={Platform.OS==='ios'?'padding':undefined}>
-    <View className="flex-row items-center justify-between px-5 pt-4 pb-3 border-b border-line bg-card">
+    <View className="flex-row items-center justify-between px-4 pt-3 pb-3 border-b border-line bg-card">
       <Pressable accessibilityRole="button" accessibilityLabel={pick('Назад','Back')} onPress={()=>router.back()} className="w-11 h-11 rounded-full border border-line items-center justify-center active:opacity-70"><ArrowLeft size={20} color={colors.ink}/></Pressable>
       <View className="items-center"><Text className="text-ink font-black">Semantic Word Hunt</Text><Text className="text-muted text-xs">{pick('Экспедиция дня','Today’s expedition')} · {completed}/{total}</Text></View>
       <View className="w-11 h-11 rounded-full bg-mint items-center justify-center"><Flame size={19} color={colors.green}/></View>
     </View>
     <Progress value={(completed/total)*100}/>
-    {game.allComplete?<View className="flex-1"><View className="w-full max-w-[720px] self-center px-5 pt-5"><LevelSelector value={game.level} onChange={game.setLevel} pick={pick}/></View><DailyComplete count={total} xp={useVocabularyStore.getState().wordHuntProgress.xp} streak={useVocabularyStore.getState().wordHuntProgress.streak}/></View>:<ScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" contentContainerClassName="w-full max-w-[720px] self-center px-5 py-6 pb-24">
+    {game.allComplete?<View className="flex-1"><View className="w-full max-w-[720px] self-center px-4 pt-4"><LevelSelector value={game.level} onChange={game.setLevel} pick={pick}/></View><DailyComplete count={total} xp={useVocabularyStore.getState().wordHuntProgress.xp} streak={useVocabularyStore.getState().wordHuntProgress.streak}/></View>:<ScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" contentContainerClassName="w-full max-w-[720px] self-center px-4 py-5 pb-24">
       {game.status==='playing'&&<LevelSelector value={game.level} onChange={game.setLevel} pick={pick}/>}
       {game.status==='playing'&&<Game target={game.target} {...game}/>}
       {game.status==='reveal'&&<Reveal target={game.target} onContinue={()=>game.setStatus('practice')}/>}
@@ -57,7 +57,7 @@ function Game({target,guess,setGuess,guesses,hintsUsed,useHint,error,loading,sub
   const errors:Record<string,string>={EMPTY:pick('Введите слово.','Type a word.'),DUPLICATE:pick('Вы уже пробовали это слово.','You already tried this word.'),INVALID:pick('Попробуйте английское слово.','Try an English word.'),NETWORK:pick('Не удалось проверить слово. Попробуйте ещё раз.','Something went wrong. Try again.')};
   const feedbackText=feedback==='very-close'?pick('Вы совсем рядом.','You’re in the right neighborhood.'):feedback==='close'?pick('Очень близко.','You’re getting very close.'):feedback==='warm'?pick('Становится теплее.','You’re getting closer.'):feedback==='far'?pick('Попробуйте подумать о другом значении.','Try thinking of another meaning.'):pick('Каждая попытка покажет, насколько вы близко.','Every guess shows how close you are.');
   return <View className="gap-5">
-    <View className="items-center pt-3 gap-2"><View className="w-14 h-14 rounded-[20px] bg-mint items-center justify-center"><Target size={28} color={colors.green}/></View><Text className="text-green text-xs font-black tracking-[2px] mt-2">{pick('НАЙДИТЕ СЛОВО','FIND THE WORD')}</Text><Text className="text-[30px] leading-[36px] font-black text-ink text-center">{pick('Я загадал английское существительное','I’m thinking of an English noun')}</Text><Text className="text-muted text-center leading-6 max-w-[420px]">{pick('Каждый запуск — новое существительное выбранного уровня.','Every launch brings a new noun at your selected level.')}</Text></View>
+    <View className="items-center pt-2 gap-2"><View className="w-12 h-12 rounded-2xl bg-mint items-center justify-center"><Target size={24} color={colors.green}/></View><Text className="text-green text-xs font-black tracking-[2px] mt-1">{pick('НАЙДИТЕ СЛОВО','FIND THE WORD')}</Text><Text className="text-[26px] leading-[32px] font-black text-ink text-center">{pick('Я загадал английское существительное','I’m thinking of an English noun')}</Text><Text className="text-muted text-sm text-center leading-5 max-w-[420px]">{pick('Каждый запуск — новое существительное выбранного уровня.','Every launch brings a new noun at your selected level.')}</Text></View>
     <Card className="p-2 flex-row">
       <View className="flex-1 items-center py-2"><Text className="text-muted text-[10px] font-black tracking-wider">{pick('УРОВЕНЬ','LEVEL')}</Text><Text className="text-ink text-lg font-black">{target.level}</Text></View>
       <View className="w-px bg-line"/>

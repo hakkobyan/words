@@ -92,11 +92,11 @@ export default function Add() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="w-full max-w-[720px] self-center px-5 pt-6 gap-5 pb-8">
+    <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="w-full max-w-[720px] self-center px-4 pt-5 gap-4 pb-8">
       <Text className="text-muted">{pick('Перевод с помощью DeepL', 'Translation powered by DeepL')}</Text>
       <Text className="text-3xl font-black text-ink -mt-2 mb-2">{pick('Новое слово', 'New word')}</Text>
 
-      <Card className="p-5 gap-5">
+      <Card className="p-4 gap-4">
         <View className="gap-2">
           <Text className="font-bold text-sm text-ink">{lang === 'english' ? pick('Английское слово', 'English word') : pick('Немецкое слово', 'German word')}</Text>
           <View className="relative">

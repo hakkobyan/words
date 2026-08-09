@@ -40,7 +40,7 @@ export default function Words() {
         keyExtractor={(w) => w.id}
         {...dataSet({ screenPad: 'true' })}
         contentContainerStyle={screenPadding}
-        contentContainerClassName="w-full max-w-[720px] self-center px-5 pt-6 gap-3 pb-8"
+        contentContainerClassName="w-full max-w-[720px] self-center px-4 pt-5 gap-3 pb-8"
         ListHeaderComponent={
           <View className="gap-3 mb-3">
             <View>

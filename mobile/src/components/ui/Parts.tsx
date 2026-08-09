@@ -23,7 +23,7 @@ export function Button({variant='default',icon,label,onPress,disabled,fullWidth,
   const s=buttonStyles[variant];
   return (
     <Pressable disabled={disabled} onPress={onPress} accessibilityRole="button" accessibilityState={{disabled}}
-      className={`min-h-12 rounded-2xl px-[18px] flex-row items-center justify-center gap-[9px] active:opacity-80 ${s.box} ${fullWidth?'w-full':''} ${disabled?'opacity-50':''} ${className}`}>
+      className={`min-h-11 rounded-2xl px-4 flex-row items-center justify-center gap-2 active:opacity-80 ${s.box} ${fullWidth?'w-full':''} ${disabled?'opacity-50':''} ${className}`}>
       {icon}
       <Text className={`font-bold ${textClassName??s.text}`}>{label}</Text>
     </Pressable>
