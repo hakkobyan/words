@@ -1,20 +1,32 @@
 import {useEffect,useMemo,useState} from 'react';
-import {getDailyHuntTargets} from '@/data/wordHunt';
+import {getDailyHuntTargets,WordHuntTarget} from '@/data/wordHunt';
 import {getSemanticRank,proximityForRank,rewardFor,SemanticGuess} from '@/lib/semanticRanking';
 import {useVocabularyStore} from '@/store/useVocabularyStore';
+import {WordHuntLevel} from '@/types';
 
 export type GameStatus='playing'|'reveal'|'practice'|'complete';
+
+function nextTarget(targets:WordHuntTarget[],completed:Set<string>,lastId?:string){
+  const available=targets.filter(target=>!completed.has(target.id));
+  if(!available.length)return targets[targets.length-1];
+  const lastIndex=available.findIndex(target=>target.id===lastId);
+  return lastIndex<0?available[0]:available[(lastIndex+1)%available.length];
+}
 
 export function useSemanticGame(){
   const progress=useVocabularyStore(s=>s.wordHuntProgress);
   const completeWord=useVocabularyStore(s=>s.completeWordHunt);
+  const rememberTarget=useVocabularyStore(s=>s.rememberWordHuntTarget);
   const level=useVocabularyStore(s=>s.settings.wordHuntLevel);
   const setSettings=useVocabularyStore(s=>s.setSettings);
   const targets=getDailyHuntTargets(level);
   const targetIds=new Set(targets.map(item=>item.id));
   const completedToday=progress.date===new Date().toISOString().slice(0,10)?progress.completedIds.filter(id=>targetIds.has(id)):[];
   const completedSet=new Set(completedToday);
-  const target=targets.find(item=>!completedSet.has(item.id))??targets[targets.length-1];
+  const candidate=nextTarget(targets,completedSet,progress.lastServedByLevel?.[level]);
+  const [selection,setSelection]=useState<{level:WordHuntLevel;id:string}>(()=>({level,id:candidate.id}));
+  const selected=selection.level===level&&!completedSet.has(selection.id)?targets.find(item=>item.id===selection.id):undefined;
+  const target=selected??candidate;
   const [guess,setGuess]=useState('');
   const [guesses,setGuesses]=useState<SemanticGuess[]>([]);
   const [status,setStatus]=useState<GameStatus>('playing');
@@ -23,6 +35,11 @@ export function useSemanticGame(){
   const [loading,setLoading]=useState(false);
   const [practiceAnswer,setPracticeAnswer]=useState<number|null>(null);
   const [reward,setReward]=useState(0);
+
+  useEffect(()=>{
+    if(selection.level!==level||selection.id!==target.id)setSelection({level,id:target.id});
+    rememberTarget(level,target.id);
+  },[level,target.id]);
 
   useEffect(()=>{
     setGuess('');setGuesses([]);setStatus('playing');setHintsUsed(0);setError('');setPracticeAnswer(null);setReward(0);

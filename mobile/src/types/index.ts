@@ -8,4 +8,4 @@ export interface Category{id:string;name:string;icon:string;isDefault:boolean;cr
 export interface VocabularySession{id:string;name:string;language:StudyLanguage;wordIds:string[];isActive:boolean;createdAt:string;updatedAt:string}
 export type WordHuntLevel='mixed'|'A1'|'A2'|'B1'|'B2'|'C1';
 export interface Settings{theme:'light'|'dark'|'system';interfaceLanguage:'ru'|'en'|'de';defaultLanguage:StudyLanguage;learnerLevel:CefrLevel;wordHuntLevel:WordHuntLevel;cardsPerSession:number;showExamples:boolean;shuffle:boolean;reverse:boolean;autoCategory:boolean;onboardingCompleted:boolean}
-export interface WordHuntProgress{date:string;completedIds:string[];xp:number;streak:number;lastCompletedDate?:string}
+export interface WordHuntProgress{date:string;completedIds:string[];xp:number;streak:number;lastCompletedDate?:string;lastServedByLevel?:Partial<Record<WordHuntLevel,string>>}

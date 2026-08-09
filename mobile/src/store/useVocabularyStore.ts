@@ -2,7 +2,7 @@ import {create} from 'zustand';
 import {generateId} from '@/lib/id';
 import {categories as defaults} from '@/data/defaults';
 import {read,write} from '@/lib/storage';
-import {Category,Settings,StudyLanguage,UserWord,VocabularySession,WordHuntProgress} from '@/types';
+import {Category,Settings,StudyLanguage,UserWord,VocabularySession,WordHuntLevel,WordHuntProgress} from '@/types';
 
 const baseSettings:Settings={theme:'system',interfaceLanguage:'ru',defaultLanguage:'english',learnerLevel:'B1',wordHuntLevel:'mixed',cardsPerSession:10,showExamples:true,shuffle:true,reverse:true,autoCategory:true,onboardingCompleted:false};
 const today=()=>new Date().toISOString().slice(0,10);
@@ -13,7 +13,7 @@ type Store={
   markDailySeen:(ids:string[])=>void;
   hydrate:()=>Promise<void>;addWord:(word:NewWord)=>void;addWords:(words:NewWord[])=>void;updateWord:(id:string,patch:Partial<UserWord>)=>void;deleteWord:(id:string)=>void;
   addCategory:(name:string,icon:string)=>void;deleteCategory:(id:string,withWords?:boolean)=>void;addSession:(name:string,language:StudyLanguage)=>string;updateSession:(id:string,patch:Partial<VocabularySession>)=>void;deleteSession:(id:string)=>void;
-  setSettings:(patch:Partial<Settings>)=>void;replaceData:(data:{words:UserWord[];categories:Category[];sessions:VocabularySession[];settings?:Settings})=>void;resetProgress:()=>void;clear:()=>void;completeWordHunt:(id:string,xp:number)=>void;
+  setSettings:(patch:Partial<Settings>)=>void;replaceData:(data:{words:UserWord[];categories:Category[];sessions:VocabularySession[];settings?:Settings})=>void;resetProgress:()=>void;clear:()=>void;rememberWordHuntTarget:(level:WordHuntLevel,id:string)=>void;completeWordHunt:(id:string,xp:number)=>void;
 };
 const persist=(state:{words:UserWord[];categories:Category[];sessions:VocabularySession[];settings:Settings})=>{write('words',state.words);write('categories',state.categories);write('sessions',state.sessions);write('settings',state.settings)};
 
@@ -65,6 +65,12 @@ export const useVocabularyStore=create<Store>((set,get)=>({
   updateSession:(id,patch)=>set(state=>{const next={sessions:state.sessions.map(session=>session.id===id?{...session,...patch,updatedAt:new Date().toISOString()}:session)};persist({...state,...next});return next}),
   deleteSession:id=>set(state=>{const next={sessions:state.sessions.filter(session=>session.id!==id),words:state.words.filter(word=>word.sessionId!==id)};persist({...state,...next});return next}),
   setSettings:patch=>set(state=>{const next={settings:{...state.settings,...patch}};persist({...state,...next});return next}),
+  rememberWordHuntTarget:(level,id)=>set(state=>{
+    const date=today(),current=state.wordHuntProgress.date===date?state.wordHuntProgress:{...state.wordHuntProgress,date,completedIds:[]};
+    const wordHuntProgress={...current,lastServedByLevel:{...current.lastServedByLevel,[level]:id}};
+    write('wordHunt',wordHuntProgress);
+    return {wordHuntProgress};
+  }),
   completeWordHunt:(id,xp)=>set(state=>{
     const date=today(),current=state.wordHuntProgress.date===date?state.wordHuntProgress:{...state.wordHuntProgress,date,completedIds:[]};
     if(current.completedIds.includes(id))return state;
