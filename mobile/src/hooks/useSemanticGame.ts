@@ -1,4 +1,4 @@
-import {useMemo,useState} from 'react';
+import {useEffect,useMemo,useState} from 'react';
 import {getDailyHuntTargets} from '@/data/wordHunt';
 import {getSemanticRank,proximityForRank,rewardFor,SemanticGuess} from '@/lib/semanticRanking';
 import {useVocabularyStore} from '@/store/useVocabularyStore';
@@ -8,8 +8,11 @@ export type GameStatus='playing'|'reveal'|'practice'|'complete';
 export function useSemanticGame(){
   const progress=useVocabularyStore(s=>s.wordHuntProgress);
   const completeWord=useVocabularyStore(s=>s.completeWordHunt);
-  const targets=getDailyHuntTargets();
-  const completedToday=progress.date===new Date().toISOString().slice(0,10)?progress.completedIds:[];
+  const level=useVocabularyStore(s=>s.settings.wordHuntLevel);
+  const setSettings=useVocabularyStore(s=>s.setSettings);
+  const targets=getDailyHuntTargets(level);
+  const targetIds=new Set(targets.map(item=>item.id));
+  const completedToday=progress.date===new Date().toISOString().slice(0,10)?progress.completedIds.filter(id=>targetIds.has(id)):[];
   const currentIndex=Math.min(completedToday.length,targets.length-1);
   const target=targets[currentIndex];
   const [guess,setGuess]=useState('');
@@ -20,6 +23,10 @@ export function useSemanticGame(){
   const [loading,setLoading]=useState(false);
   const [practiceAnswer,setPracticeAnswer]=useState<number|null>(null);
   const [reward,setReward]=useState(0);
+
+  useEffect(()=>{
+    setGuess('');setGuesses([]);setStatus('playing');setHintsUsed(0);setError('');setPracticeAnswer(null);setReward(0);
+  },[level]);
 
   const bestRank=useMemo(()=>guesses.reduce((best,item)=>Math.min(best,item.rank),Infinity),[guesses]);
   const feedback=bestRank<=15?'very-close':bestRank<=75?'close':bestRank<=250?'warm':bestRank<Infinity?'far':'none';
@@ -47,5 +54,5 @@ export function useSemanticGame(){
     setGuess('');setGuesses([]);setStatus('playing');setHintsUsed(0);setError('');setPracticeAnswer(null);setReward(0);
   };
 
-  return {target,targets,completedToday,guess,setGuess,guesses,status,setStatus,hintsUsed,useHint,error,loading,submit,bestRank,feedback,practiceAnswer,answerPractice,finishPractice,reward,nextWord,proximityForRank,allComplete:completedToday.length>=targets.length};
+  return {target,targets,completedToday,level,setLevel:(next:typeof level)=>setSettings({wordHuntLevel:next}),guess,setGuess,guesses,status,setStatus,hintsUsed,useHint,error,loading,submit,bestRank,feedback,practiceAnswer,answerPractice,finishPractice,reward,nextWord,proximityForRank,allComplete:completedToday.length>=targets.length};
 }
