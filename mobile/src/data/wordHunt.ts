@@ -42,8 +42,9 @@ export const WORD_HUNT_TARGETS:WordHuntTarget[]=[
   },
 ];
 
-export const getDailyHuntTargets=(date=new Date())=>{
+export const getDailyHuntTargets=(level:'mixed'|'B2'|'C1'='mixed',date=new Date())=>{
+  const pool=level==='mixed'?WORD_HUNT_TARGETS:WORD_HUNT_TARGETS.filter(target=>target.level===level);
   const day=Math.floor(Date.UTC(date.getUTCFullYear(),date.getUTCMonth(),date.getUTCDate())/86400000);
-  const offset=day%WORD_HUNT_TARGETS.length;
-  return [...WORD_HUNT_TARGETS.slice(offset),...WORD_HUNT_TARGETS.slice(0,offset)];
+  const offset=day%pool.length;
+  return [...pool.slice(offset),...pool.slice(0,offset)];
 };

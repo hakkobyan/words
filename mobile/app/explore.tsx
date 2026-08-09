@@ -10,6 +10,7 @@ import {useThemeColors} from '@/lib/theme';
 import {useI18n} from '@/lib/i18n';
 import {useVocabularyStore} from '@/store/useVocabularyStore';
 import {WordHuntTarget} from '@/data/wordHunt';
+import {WordHuntLevel} from '@/types';
 
 const proximityCopy:Record<Proximity,[string,string]>={
   correct:['Найдено','Found'],
@@ -24,23 +25,30 @@ export default function Explore(){
   const colors=useThemeColors();
   const {pick}=useI18n();
   const completed=game.completedToday.length;
+  const total=game.targets.length;
   const scrollRef=useRef<ScrollView>(null);
   useEffect(()=>{scrollRef.current?.scrollTo({y:0,animated:true})},[game.status]);
 
   return <KeyboardAvoidingView className="flex-1 bg-paper" behavior={Platform.OS==='ios'?'padding':undefined}>
     <View className="flex-row items-center justify-between px-5 pt-4 pb-3 border-b border-line bg-card">
       <Pressable accessibilityRole="button" accessibilityLabel={pick('Назад','Back')} onPress={()=>router.back()} className="w-11 h-11 rounded-full border border-line items-center justify-center active:opacity-70"><ArrowLeft size={20} color={colors.ink}/></Pressable>
-      <View className="items-center"><Text className="text-ink font-black">Semantic Word Hunt</Text><Text className="text-muted text-xs">{pick('Экспедиция дня','Today’s expedition')} · {completed}/5</Text></View>
+      <View className="items-center"><Text className="text-ink font-black">Semantic Word Hunt</Text><Text className="text-muted text-xs">{pick('Экспедиция дня','Today’s expedition')} · {completed}/{total}</Text></View>
       <View className="w-11 h-11 rounded-full bg-mint items-center justify-center"><Flame size={19} color={colors.green}/></View>
     </View>
-    <Progress value={(completed/5)*100}/>
-    {game.allComplete?<DailyComplete xp={useVocabularyStore.getState().wordHuntProgress.xp} streak={useVocabularyStore.getState().wordHuntProgress.streak}/>:<ScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" contentContainerClassName="w-full max-w-[720px] self-center px-5 py-6 pb-24">
+    <Progress value={(completed/total)*100}/>
+    {game.allComplete?<View className="flex-1"><View className="w-full max-w-[720px] self-center px-5 pt-5"><LevelSelector value={game.level} onChange={game.setLevel} pick={pick}/></View><DailyComplete count={total} xp={useVocabularyStore.getState().wordHuntProgress.xp} streak={useVocabularyStore.getState().wordHuntProgress.streak}/></View>:<ScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" contentContainerClassName="w-full max-w-[720px] self-center px-5 py-6 pb-24">
+      {game.status==='playing'&&<LevelSelector value={game.level} onChange={game.setLevel} pick={pick}/>}
       {game.status==='playing'&&<Game target={game.target} {...game}/>}
       {game.status==='reveal'&&<Reveal target={game.target} onContinue={()=>game.setStatus('practice')}/>}
       {game.status==='practice'&&<Practice target={game.target} answer={game.practiceAnswer} onAnswer={game.answerPractice} onContinue={game.finishPractice}/>}
       {game.status==='complete'&&<Complete target={game.target} guesses={game.guesses.length} hints={game.hintsUsed} reward={game.reward} onNext={game.nextWord}/>}
     </ScrollView>}
   </KeyboardAvoidingView>;
+}
+
+function LevelSelector({value,onChange,pick}:{value:WordHuntLevel;onChange:(level:WordHuntLevel)=>void;pick:(ru:string,en:string)=>string}){
+  const options:[WordHuntLevel,string][]=[['mixed',pick('Смешанный','Mixed')],['B2','B2'],['C1','C1']];
+  return <View className="mb-5"><Text className="text-muted text-xs font-black tracking-wider mb-2">{pick('СЛОЖНОСТЬ СЛОВ','WORD LEVEL')}</Text><View className="flex-row bg-paper-2 border border-line rounded-2xl p-1 gap-1">{options.map(([level,label])=>{const active=value===level;return <Pressable key={level} accessibilityRole="button" accessibilityState={{selected:active}} onPress={()=>onChange(level)} className={`flex-1 min-h-11 rounded-xl items-center justify-center ${active?'bg-card-strong border border-line':'border border-transparent'}`}><Text className={`font-black text-sm ${active?'text-green':'text-muted'}`}>{label}</Text></Pressable>})}</View></View>;
 }
 
 function Game({target,guess,setGuess,guesses,hintsUsed,useHint,error,loading,submit,feedback,bestRank,proximityForRank}:{target:WordHuntTarget;guess:string;setGuess:(v:string)=>void;guesses:SemanticGuess[];hintsUsed:number;useHint:()=>void;error:string;loading:boolean;submit:()=>void;feedback:string;bestRank:number;proximityForRank:(rank:number)=>Proximity}){
@@ -89,4 +97,4 @@ function Practice({target,answer,onAnswer,onContinue}:{target:WordHuntTarget;ans
 
 function Complete({target,guesses,hints,reward,onNext}:{target:WordHuntTarget;guesses:number;hints:number;reward:number;onNext:()=>void}){const colors=useThemeColors();const {pick}=useI18n();return <Animated.View entering={ZoomIn.duration(260)} className="flex-1 justify-center gap-5 pt-12"><View className="items-center gap-3"><View className="w-20 h-20 rounded-full bg-mint items-center justify-center"><Check size={38} color={colors.success}/></View><Text className="text-success text-xs font-black tracking-[2px]">{pick('СЛОВО ОСВОЕНО','WORD MASTERED')}</Text><Text className="text-4xl font-black text-ink uppercase">{target.word}</Text></View><Card className="p-5 flex-row justify-around"><Metric value={String(guesses)} label={pick('попыток','guesses')}/><Metric value={String(hints)} label={pick('подсказок','hints')}/><Metric value={`+${reward}`} label="XP"/></Card><Button variant="primary" fullWidth icon={<ChevronRight size={19} color={colors.cardStrong}/>} label={pick('Следующее слово','Next word')} onPress={onNext}/></Animated.View>}
 function Metric({value,label}:{value:string;label:string}){return <View className="items-center"><Text className="text-2xl font-black text-ink">{value}</Text><Text className="text-muted text-xs">{label}</Text></View>}
-function DailyComplete({xp,streak}:{xp:number;streak:number}){const colors=useThemeColors();const {pick}=useI18n();return <View className="flex-1 items-center justify-center p-6"><Animated.View entering={ZoomIn.duration(300)} className="w-full max-w-[520px] gap-5"><View className="items-center gap-3"><View className="w-20 h-20 rounded-full bg-success items-center justify-center"><Trophy size={38} color={colors.cardStrong}/></View><Text className="text-3xl font-black text-ink text-center">{pick('Экспедиция завершена','Today’s expedition complete')}</Text><Text className="text-muted text-center">{pick('Все 5 слов найдены и закреплены.','All 5 words discovered and practiced.')}</Text></View><Card className="p-5 flex-row justify-around"><Metric value="5 / 5" label={pick('слов','words')}/><Metric value={`+${xp}`} label="XP"/><Metric value={String(streak)} label={pick('дней подряд','day streak')}/></Card><Button variant="primary" fullWidth label={pick('Вернуться к тренировкам','Back to study')} onPress={()=>router.replace('/study')}/></Animated.View></View>}
+function DailyComplete({count,xp,streak}:{count:number;xp:number;streak:number}){const colors=useThemeColors();const {pick}=useI18n();return <View className="flex-1 items-center justify-center p-6"><Animated.View entering={ZoomIn.duration(300)} className="w-full max-w-[520px] gap-5"><View className="items-center gap-3"><View className="w-20 h-20 rounded-full bg-success items-center justify-center"><Trophy size={38} color={colors.cardStrong}/></View><Text className="text-3xl font-black text-ink text-center">{pick('Экспедиция завершена','Today’s expedition complete')}</Text><Text className="text-muted text-center">{pick(`Все ${count} слов найдены и закреплены.`,`All ${count} words discovered and practiced.`)}</Text></View><Card className="p-5 flex-row justify-around"><Metric value={`${count} / ${count}`} label={pick('слов','words')}/><Metric value={`+${xp}`} label="XP"/><Metric value={String(streak)} label={pick('дней подряд','day streak')}/></Card><Button variant="primary" fullWidth label={pick('Вернуться к тренировкам','Back to study')} onPress={()=>router.replace('/study')}/></Animated.View></View>}

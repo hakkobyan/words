@@ -4,7 +4,7 @@ import {categories as defaults} from '@/data/defaults';
 import {read,write} from '@/lib/storage';
 import {Category,Settings,StudyLanguage,UserWord,VocabularySession,WordHuntProgress} from '@/types';
 
-const baseSettings:Settings={theme:'system',interfaceLanguage:'ru',defaultLanguage:'english',learnerLevel:'B1',cardsPerSession:10,showExamples:true,shuffle:true,reverse:true,autoCategory:true,onboardingCompleted:false};
+const baseSettings:Settings={theme:'system',interfaceLanguage:'ru',defaultLanguage:'english',learnerLevel:'B1',wordHuntLevel:'mixed',cardsPerSession:10,showExamples:true,shuffle:true,reverse:true,autoCategory:true,onboardingCompleted:false};
 const today=()=>new Date().toISOString().slice(0,10);
 const emptyWordHunt=():WordHuntProgress=>({date:today(),completedIds:[],xp:0,streak:0});
 type NewWord=Omit<UserWord,'id'|'createdAt'|'updatedAt'>;
