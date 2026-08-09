@@ -1,6 +1,6 @@
 import {useColorScheme} from 'nativewind';
 
-const light={ink:'#2b2523',muted:'#786b65',paper:'#faf7f2',paper2:'#f3ede6',card:'#ffffff',cardStrong:'#fffdfb',plum:'#765d74',lilac:'#f1e8f0',orange:'#d27c58',line:'#e8ded5',danger:'#a23f36',success:'#626b82',placeholder:'#8b7c75',onPrimary:'#fffaf4',heroBg:'#5d465b',heroText:'#fff9f4',heroActionBg:'#fffaf6',heroActionText:'#4c374a'};
+const light={ink:'#241c18',muted:'#75655c',paper:'#f6efe7',paper2:'#ede3d8',card:'#fffcf8',cardStrong:'#ffffff',plum:'#66566f',lilac:'#ede5ef',orange:'#c97852',line:'#ded0c4',danger:'#a23f36',success:'#5f617a',placeholder:'#76655c',onPrimary:'#fffaf4',heroBg:'#754a3a',heroText:'#fffaf4',heroActionBg:'#fffaf3',heroActionText:'#4f3026'};
 const dark={ink:'#f7f1eb',muted:'#bdaea5',paper:'#171412',paper2:'#24201d',card:'#29231f',cardStrong:'#332b26',plum:'#c8b2cf',lilac:'#3d3040',orange:'#e09a75',line:'#493e37',danger:'#ef8f85',success:'#bec0da',placeholder:'#bca79b',onPrimary:'#221713',heroBg:'#704536',heroText:'#fffaf4',heroActionBg:'#fffaf3',heroActionText:'#4f3026'};
 
 export function useThemeColors(){
