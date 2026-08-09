@@ -10,7 +10,7 @@ import { backupPayload } from '@/lib/storage';
 import { Card, Button, Select } from '@/components/ui/Parts';
 import { useI18n } from '@/lib/i18n';
 import { useThemeColors } from '@/lib/theme';
-import { CEFR_LEVELS, CefrLevel, StudyLanguage } from '@/types';
+import { CEFR_LEVELS, CefrLevel, StudyLanguage, WordHuntLevel } from '@/types';
 
 export default function Settings() {
   const store = useVocabularyStore();
@@ -170,6 +170,22 @@ export default function Settings() {
           />
           <Text className="text-muted text-xs">
             {pick('YouTube Vocabulary сначала показывает уровень выше выбранного.', 'YouTube Vocabulary starts with levels above this selection.')}
+          </Text>
+        </View>
+        <View className="gap-2">
+          <Text className="font-bold text-sm text-ink">{pick('Уровень слов в Word Hunt', 'Word Hunt level')}</Text>
+          <Select
+            label={pick('Уровень слов в Word Hunt', 'Word Hunt level')}
+            value={store.settings.wordHuntLevel}
+            onChange={(v: WordHuntLevel) => store.setSettings({ wordHuntLevel: v })}
+            options={[
+              { value: 'mixed' as WordHuntLevel, label: pick('Смешанный · B2 и C1', 'Mixed · B2 and C1') },
+              { value: 'B2' as WordHuntLevel, label: 'B2' },
+              { value: 'C1' as WordHuntLevel, label: 'C1' },
+            ]}
+          />
+          <Text className="text-muted text-xs">
+            {pick('Word Hunt будет подбирать ежедневные слова выбранного уровня.', 'Word Hunt will use daily words from the selected level.')}
           </Text>
         </View>
         <View className="gap-2">
