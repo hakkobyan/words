@@ -47,7 +47,7 @@ export default function Explore(){
 }
 
 function LevelSelector({value,onChange,pick}:{value:WordHuntLevel;onChange:(level:WordHuntLevel)=>void;pick:(ru:string,en:string)=>string}){
-  const options:[WordHuntLevel,string][]=[['mixed',pick('Все','All')],['A1','A1'],['A2','A2'],['B1','B1'],['B2','B2'],['C1','C1']];
+  const options:[WordHuntLevel,string][]=[['mixed',pick('Все','All')],['A1','A1'],['A2','A2'],['B1','B1'],['B2','B2'],['C1','C1'],['C2','C2']];
   return <View className="mb-5"><Text className="text-muted text-xs font-black tracking-wider mb-2">{pick('СЛОЖНОСТЬ СЛОВ','WORD LEVEL')}</Text><View className="flex-row bg-paper-2 border border-line rounded-2xl p-1 gap-1">{options.map(([level,label])=>{const active=value===level;return <Pressable key={level} accessibilityRole="button" accessibilityState={{selected:active}} onPress={()=>onChange(level)} className={`flex-1 min-h-11 rounded-xl items-center justify-center ${active?'bg-card-strong border border-line':'border border-transparent'}`}><Text className={`font-black text-sm ${active?'text-green':'text-muted'}`}>{label}</Text></Pressable>})}</View></View>;
 }
 

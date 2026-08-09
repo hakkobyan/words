@@ -13,7 +13,7 @@ const stableFarRank=(target:string,guess:string)=>{
 export async function getSemanticRank(target:WordHuntTarget,rawGuess:string):Promise<number>{
   const guess=normalize(rawGuess);
   if(!guess)throw new Error('EMPTY');
-  if(!/^[a-z][a-z'-]{1,30}$/.test(guess))throw new Error('INVALID');
+  if(!/^[a-z][a-z' -]{1,30}$/.test(guess))throw new Error('INVALID');
   await new Promise(resolve=>setTimeout(resolve,240));
   if(guess===target.word)return 1;
   return target.neighbors[guess]??stableFarRank(target.word,guess);
