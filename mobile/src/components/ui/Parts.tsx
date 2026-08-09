@@ -7,7 +7,7 @@ import {useI18n} from '@/lib/i18n';
 import {useThemeColors} from '@/lib/theme';
 
 export function Card({children,className='',style}:{children:React.ReactNode;className?:string;style?:ViewStyle}){
-  return <View style={style} className={`bg-card border border-line rounded-[20px] ${className}`}>{children}</View>;
+  return <View style={style} className={`bg-card border border-line rounded-[20px] shadow-sm shadow-[#4c374a12] dark:shadow-none ${className}`}>{children}</View>;
 }
 
 type ButtonVariant='default'|'primary'|'secondary'|'danger'|'warning'|'border';
@@ -53,10 +53,10 @@ export function LanguageSelector({value,onChange}:{value:StudyLanguage;onChange:
   );
 }
 
-export function Progress({value}:{value:number}){
+export function Progress({value,onDark=false}:{value:number;onDark?:boolean}){
   const clamped=Math.max(0,Math.min(100,value));
   return (
-    <View className="h-[9px] bg-paper-2 border border-line rounded-full overflow-hidden" accessibilityRole="progressbar" accessibilityValue={{min:0,max:100,now:Math.round(value)}}>
+    <View className={`h-[9px] rounded-full overflow-hidden ${onDark?'bg-white/20 border border-white/20':'bg-paper-2 border border-line'}`} accessibilityRole="progressbar" accessibilityValue={{min:0,max:100,now:Math.round(value)}}>
       <View className="h-full bg-orange rounded-full" style={{width:`${clamped}%`}}/>
     </View>
   );
