@@ -75,7 +75,7 @@ export default function Home() {
       </View>
 
       <View className="flex-row flex-wrap gap-3">
-        {stats.map(([n,l,e])=><Card key={l} className="p-4" style={{width:'47%'}}><Text className="text-xl">{e}</Text><Text className="text-2xl font-black text-ink mt-2">{n}</Text><Text className="text-muted text-sm">{l}</Text></Card>)}
+        {stats.map(([n,l,e])=><Card key={l} className="p-4" style={{flexBasis:'47%',flexGrow:1}}><Text className="text-xl">{e}</Text><Text className="text-2xl font-black text-ink mt-2">{n}</Text><Text className="text-muted text-sm">{l}</Text></Card>)}
       </View>
 
       <View className="gap-6">
@@ -144,7 +144,7 @@ export default function Home() {
             const p = ws.length ? Math.round((ws.filter((w) => w.learned).length / ws.length) * 100) : 0;
             return (
               <Link href={`/categories/${c.id}`} key={c.id} asChild>
-                <Pressable style={{ width: '47%' }}>
+                <Pressable style={{flexBasis:'47%',flexGrow:1}}>
                   <Card className="p-4">
                     <Text className="text-2xl">{c.icon}</Text>
                     <Text className="font-bold text-ink mt-3">{categoryLabel(c.id, c.name, locale)}</Text>
