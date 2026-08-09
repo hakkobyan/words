@@ -41,7 +41,7 @@ function FilterChip({ label, checked, onToggle }: { label: string; checked: bool
       className="min-h-12 rounded-2xl px-4 flex-row items-center gap-3 bg-card-strong border border-line"
     >
       <View className="w-5 h-5 rounded-[6px] items-center justify-center border" style={{ borderColor: colors.line, backgroundColor: checked ? colors.green : 'transparent' }}>
-        {checked && <Check size={14} color="#fffaf4" />}
+        {checked && <Check size={14} color={colors.paper} />}
       </View>
       <Text className="text-ink flex-1">{label}</Text>
     </Pressable>
@@ -199,7 +199,7 @@ export default function YouTubeVocabulary() {
         </View>
         <Button
           variant="primary"
-          icon={state === 'loading' ? <ActivityIndicator color="#fffaf4" /> : <Sparkles size={20} color="#fffaf4" />}
+          icon={state === 'loading' ? <ActivityIndicator color={colors.onPrimary} /> : <Sparkles size={20} color={colors.onPrimary} />}
           label={state === 'loading' ? 'Analyzing…' : 'Analyze video'}
           onPress={analyze}
           disabled={state === 'loading'}
@@ -227,7 +227,7 @@ export default function YouTubeVocabulary() {
           <Text className="text-muted mt-2 text-center">{activeError.text}</Text>
           <Button
             variant="primary"
-            icon={<RefreshCw size={18} color="#fffaf4" />}
+            icon={<RefreshCw size={18} color={colors.onPrimary} />}
             label="Try another video"
             onPress={() => {
               setState('idle');
@@ -299,7 +299,7 @@ export default function YouTubeVocabulary() {
               />
               <Button
                 variant="primary"
-                icon={<Check size={18} color="#fffaf4" />}
+                icon={<Check size={18} color={colors.onPrimary} />}
                 label="Add all"
                 onPress={() => addItems(analysis.vocabulary.filter((item) => !ignoredIds.includes(item.id)))}
                 disabled={!analysis.vocabulary.some((item) => !knownByWord.has(wordKey(item.word)))}

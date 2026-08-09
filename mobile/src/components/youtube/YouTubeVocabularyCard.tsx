@@ -34,7 +34,7 @@ export default function YouTubeVocabularyCard({ item, selected, isKnown, onSelec
             className="w-5 h-5 rounded-[6px] items-center justify-center border"
             style={{ borderColor: colors.line, backgroundColor: selected ? colors.green : 'transparent', opacity: isKnown ? 0.5 : 1 }}
           >
-            {selected && <Check size={14} color="#fffaf4" />}
+            {selected && <Check size={14} color={colors.paper} />}
           </View>
         </Pressable>
         <View className="flex-1 min-w-0">
@@ -86,7 +86,7 @@ export default function YouTubeVocabularyCard({ item, selected, isKnown, onSelec
             {isKnown ? (
               <Button variant="secondary" icon={<RotateCcw size={17} color={colors.green} />} label="Review again" onPress={onReview} />
             ) : (
-              <Button variant="primary" icon={<Plus size={18} color="#fffaf4" />} label="Add" onPress={onAdd} />
+              <Button variant="primary" icon={<Plus size={18} color={colors.onPrimary} />} label="Add" onPress={onAdd} />
             )}
             <Button variant="default" icon={<EyeOff size={18} color={colors.ink} />} label="Ignore" onPress={onIgnore} />
             {isKnown && (

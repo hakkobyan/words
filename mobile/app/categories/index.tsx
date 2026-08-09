@@ -25,7 +25,7 @@ export default function Categories() {
         />
         <Button
           variant="primary"
-          icon={<Plus size={18} color="#fffaf4" />}
+          icon={<Plus size={18} color={colors.onPrimary} />}
           label="Создать"
           onPress={() => {
             if (name.trim()) {
