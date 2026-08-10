@@ -5,11 +5,9 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
  * The real safe-area insets, kept reachable after the tab navigator has been
  * handed zeroes.
  *
- * React Navigation insets each screen by the safe area, which stops content
- * from ever passing under the status bar — so the strip there has nothing to
- * blur and reads as a solid block. Screens are given the full height instead
- * and add the inset to their scroll padding, which puts the content back where
- * it was while letting it slide underneath as you scroll.
+ * React Navigation insets each screen by the safe area. We keep the navigator
+ * full-height and add the real values to screen padding ourselves so the solid
+ * notch surface and floating home-indicator menu can be rendered consistently.
  */
 const RealInsets = createContext({top: 0, bottom: 0});
 

@@ -1,10 +1,9 @@
 import { router, Tabs } from 'expo-router';
-import { BlurView } from 'expo-blur';
 import { Brain, Home, Library, Menu, Plus, Tv } from 'lucide-react-native';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useI18n } from '@/lib/i18n';
-import { useIsDarkTheme, useThemeColors, withAlpha } from '@/lib/theme';
+import { useThemeColors } from '@/lib/theme';
 import { dataSet } from '@/lib/web';
 import { useRealInsets } from '@/lib/insets';
 
@@ -21,16 +20,23 @@ function tabLabel(routeName: string, t: (key: 'home' | 'words' | 'add' | 'study'
 function CustomTabBar({ state, navigation }: { state: { routes: { key: string; name: string }[]; index: number }; navigation: { navigate: (name: string) => void } }) {
   const insets = useRealInsets();
   const colors = useThemeColors();
-  const isDark = useIsDarkTheme();
   const { t } = useI18n();
   return (
-    // Blur underneath, the app's own colour layered on top: BlurView paints its
-    // own generic tint and would otherwise override any backgroundColor given
-    // to it, leaving the bar grey instead of matching the menu surface.
-    // Styled inline rather than with className — NativeWind only maps classes
-    // onto components it has been taught about, and BlurView is not one.
-    <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, borderTopWidth: 1, borderTopColor: colors.line }}>
-      <BlurView intensity={60} tint={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
+    // Matches the original web shell from f3b6894: a solid floating card with
+    // an 8px outer edge, while the home-indicator inset stays inside the card.
+    <View
+      style={{
+        position: 'absolute',
+        bottom: 8,
+        left: 8,
+        right: 8,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: colors.line,
+        borderRadius: 18,
+        backgroundColor: colors.card,
+      }}
+    >
       <View
         // data-safe-bottom lets the stylesheet supply the real inset on web,
         // where the safe-area library reports zero.
@@ -43,7 +49,7 @@ function CustomTabBar({ state, navigation }: { state: { routes: { key: string; n
           // Carries the bar's surface through the home-indicator area, so the
           // strip below it reads as part of the menu rather than the page.
           paddingBottom: insets.bottom + 8,
-          backgroundColor: withAlpha(colors.card, isDark ? 0.7 : 0.75),
+          backgroundColor: colors.card,
         }}
       >
       {state.routes.map((route, index) => {
@@ -76,13 +82,11 @@ function CustomTabBar({ state, navigation }: { state: { routes: { key: string; n
 export default function TabsLayout() {
   const insets = useRealInsets();
   const colors = useThemeColors();
-  const isDark = useIsDarkTheme();
   return (
     <View className="flex-1 bg-paper">
-      {/* Zeroed for the navigator only: otherwise it insets every screen by the
-          safe area, so nothing ever passes under the status bar and the strip
-          there has nothing to blur. Screens add the inset to their own scroll
-          padding instead — see useRealInsets. */}
+      {/* Zeroed for the navigator only: screens add the real inset to their own
+          scroll padding while this layout paints the notch and home-indicator
+          surfaces itself — see useRealInsets. */}
       <SafeAreaInsetsContext.Provider value={ZERO_INSETS}>
         <Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
           <Tabs.Screen name="index" />
@@ -92,18 +96,15 @@ export default function TabsLayout() {
           <Tabs.Screen name="study" />
         </Tabs>
       </SafeAreaInsetsContext.Provider>
-      {/* Content scrolls beneath the status bar; this frosts it rather than
-          hiding it behind a solid block. */}
+      {/* f3b6894 used the page background around the iOS browser chrome. Keep
+          that same solid surface behind the notch instead of a tinted blur. */}
       {/* Rendered even when the inset reads zero: on web the stylesheet gives it
           the real height, and a zero-height strip is simply invisible. */}
       <View
         pointerEvents="none"
         {...dataSet({ safeTop: 'true' })}
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: insets.top, zIndex: 10 }}
-      >
-        <BlurView intensity={75} tint={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
-        <View style={{ flex: 1, backgroundColor: withAlpha(colors.paper, isDark ? 0.16 : 0.22) }} />
-      </View>
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: insets.top, zIndex: 10, backgroundColor: colors.paper }}
+      />
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Ещё"
