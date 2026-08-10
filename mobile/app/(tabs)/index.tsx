@@ -30,7 +30,7 @@ export default function Home() {
   const pct = s.words.length ? Math.round((learned / s.words.length) * 100) : 0;
   const stats = [
     [s.words.length, pick('Всего слов', 'Total words'), '📚'],
-    [s.words.filter((w) => w.language === 'english').length, pick('Английских', 'English'), 'GB'],
+    [s.words.filter((w) => w.language === 'english').length, pick('Английских', 'English'), 'EN'],
     [s.words.filter((w) => w.language === 'german').length, pick('Немецких', 'German'), 'DE'],
     [due, pick('На повторение', 'To review'), '🔥'],
   ] as const;
@@ -75,7 +75,7 @@ export default function Home() {
       </View>
 
       <View className="flex-row flex-wrap gap-3">
-        {stats.map(([n,l,e])=><Card key={l} className="p-4" style={{flexBasis:'47%',flexGrow:1}}><Text className="text-xl">{e}</Text><Text className="text-2xl font-black text-ink mt-2">{n}</Text><Text className="text-muted text-sm">{l}</Text></Card>)}
+        {stats.map(([n,l,e])=><Card key={l} className="p-4" style={{flexBasis:'47%',flexGrow:1}}><Text className="text-xl text-ink">{e}</Text><Text className="text-2xl font-black text-ink mt-2">{n}</Text><Text className="text-muted text-sm">{l}</Text></Card>)}
       </View>
 
       <View className="gap-6">
