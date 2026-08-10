@@ -1,5 +1,4 @@
 import {BankWord,wordBank} from '@/data/wordBank';
-import {CEFR_RANK} from '@/lib/youtube-vocabulary';
 import {shuffle} from '@/lib/shuffle';
 import {CefrLevel,StudyLanguage,UserWord} from '@/types';
 
@@ -29,13 +28,16 @@ export function promptFor(card:DailyCard){return card.direction==='toRu'?card.en
 export function answersFor(card:DailyCard){return card.direction==='toRu'?russianAnswers(card.entry):[card.entry.word]}
 
 /**
- * Picks the next batch of unseen words at or above the learner's level, skipping
- * anything already in their dictionary. Once the pool runs dry the seen list is
- * ignored so the drill keeps working instead of coming up empty.
+ * Picks the next batch of unseen words from the learner's exact level, skipping
+ * anything already in their dictionary when the remaining pool is large enough.
+ * Once a pool runs dry, earlier or owned words from the same level can return so
+ * the drill keeps offering ten cards without mixing CEFR levels.
  */
 export function pickDailyWords(language:StudyLanguage,level:CefrLevel,seenIds:string[],ownedWords:UserWord[]):DailyCard[]{
   const owned=new Set(ownedWords.filter(word=>word.language===language).map(word=>word.word.trim().toLowerCase()));
-  const eligible=wordBank[language].filter(entry=>CEFR_RANK[entry.level]>=CEFR_RANK[level]&&!owned.has(entry.word.toLowerCase()));
+  const levelWords=wordBank[language].filter(entry=>entry.level===level);
+  const unowned=levelWords.filter(entry=>!owned.has(entry.word.toLowerCase()));
+  const eligible=unowned.length>=DAILY_COUNT?unowned:levelWords;
   const seen=new Set(seenIds);
   const fresh=eligible.filter(entry=>!seen.has(entry.id));
   const pool=fresh.length>=DAILY_COUNT?fresh:eligible;
