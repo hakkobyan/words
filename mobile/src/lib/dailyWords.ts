@@ -1,5 +1,5 @@
 import {BankWord,wordBank} from '@/data/wordBank';
-import {NOUN_HUNT_TARGETS} from '@/data/wordHunt';
+import {CEFR_VOCABULARY} from '@/data/cefrVocabulary';
 import {shuffle} from '@/lib/shuffle';
 import {CefrLevel,StudyLanguage,UserWord} from '@/types';
 
@@ -20,7 +20,7 @@ export const dailySession={
 
 export interface DailyEntry extends BankWord{cloze?:string}
 
-/** Translation cards work both ways; imported Word Hunt nouns use a source sentence. */
+/** Translation cards work both ways; entries without a translation can use a cloze sentence. */
 export type Direction='toRu'|'fromRu'|'cloze';
 export interface DailyCard{entry:DailyEntry;direction:Direction}
 
@@ -42,7 +42,7 @@ export function answersFor(card:DailyCard){return card.direction==='toRu'?russia
 export function pickDailyWords(language:StudyLanguage,level:CefrLevel,seenIds:string[],ownedWords:UserWord[]):DailyCard[]{
   const owned=new Set(ownedWords.filter(word=>word.language===language).map(word=>word.word.trim().toLowerCase()));
   const bank:DailyEntry[]=language==='english'
-    ?NOUN_HUNT_TARGETS.map(target=>({id:`english:${target.id}`,word:target.word,translationRu:target.translationRu,level:target.level,categoryId:target.categoryId,cloze:target.cloze}))
+    ?CEFR_VOCABULARY
     :wordBank[language];
   const levelWords=bank.filter(entry=>entry.level===level);
   const unowned=levelWords.filter(entry=>!owned.has(entry.word.toLowerCase()));
