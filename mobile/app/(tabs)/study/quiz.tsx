@@ -67,7 +67,7 @@ export default function Quiz() {
           <Text className="text-muted my-5">
             {pick('Точность', 'Accuracy')} {Math.round((score / deck.length) * 100)}%
           </Text>
-          <Button variant="primary" label={pick('На главную', 'Home')} onPress={() => router.push('/')} />
+          <Button variant="primary" label={pick('К тренировкам', 'Study modes')} onPress={() => router.replace('/study')} />
         </Card>
       </View>
     );

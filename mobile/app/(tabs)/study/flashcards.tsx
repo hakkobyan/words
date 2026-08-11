@@ -87,7 +87,7 @@ export default function Flashcards() {
               <Text className="text-muted text-xs">{pick('Не знаю', "Don't know")}</Text>
             </View>
           </View>
-          <Button variant="primary" label={pick('На главную', 'Home')} onPress={() => router.push('/')} />
+          <Button variant="primary" label={pick('К тренировкам', 'Study modes')} onPress={() => router.replace('/study')} />
         </Card>
       </View>
     );

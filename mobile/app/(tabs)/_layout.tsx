@@ -56,7 +56,13 @@ function CustomTabBar({ state, navigation }: { state: { routes: { key: string; n
             accessibilityRole="tab"
             accessibilityLabel={tabLabel(route.name, t)}
             accessibilityState={{selected:isFocused}}
-            onPress={() => navigation.navigate(route.name)}
+            onPress={() => {
+              if (route.name === 'study') {
+                router.replace('/study');
+                return;
+              }
+              navigation.navigate(route.name);
+            }}
             className="flex-1 items-center gap-1 py-1"
           >
             <View className={isAdd?'bg-primary-bg rounded-2xl p-3 -mt-7':''} style={isAdd?{elevation:4}:undefined}>
