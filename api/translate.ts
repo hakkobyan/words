@@ -7,7 +7,13 @@ type CacheEntry={expiresAt:number;suggestions:string[]};
 
 const cache=new Map<string,CacheEntry>();
 const CACHE_TTL=24*60*60*1000;
-function contextsFor(word:string,language:'english'|'german'){
+function contextsFor(word:string,language:'english'|'german',sourceIsRussian:boolean){
+  if(sourceIsRussian)return [
+    `В этом контексте «${word}» относится к людям, предметам и повседневным действиям.`,
+    `В этом контексте «${word}» относится к работе, деньгам, науке или технологиям.`,
+    `В этом контексте «${word}» относится к природе, месту, предмету или движению.`,
+    `В этом контексте «${word}» выражает абстрактную идею, эмоцию или переносное значение.`,
+  ];
   return language==='english'?[
     `In this passage, “${word}” relates to ordinary people, objects, and everyday actions.`,
     `In this passage, “${word}” relates to money, work, science, or technology.`,
@@ -39,17 +45,20 @@ export default async function handler(req:VercelRequest,res:VercelResponse){
     if(!clean||!sourceLanguage)return res.status(400).json({error:'Укажите слово и язык.'});
     if(clean.length>200)return res.status(400).json({error:'Слишком длинный текст.'});
 
-    const cacheKey=`v2:${sourceLanguage}:${clean.toLocaleLowerCase()}`;
+    const sourceIsRussian=/[\u0400-\u04ff]/.test(clean);
+    const direction=sourceIsRussian?'from-ru':'to-ru';
+    const cacheKey=`v3:${sourceLanguage}:${direction}:${clean.toLocaleLowerCase()}`;
     const cached=cache.get(cacheKey);
     if(cached&&cached.expiresAt>Date.now())return res.status(200).json({suggestions:cached.suggestions});
 
     const key=process.env.DEEPL_API_KEY;
     if(!key)return res.status(503).json({error:'Переводчик пока не настроен.'});
     const base=(process.env.DEEPL_API_URL||(key.endsWith(':fx')?'https://api-free.deepl.com':'https://api.deepl.com')).replace(/\/$/,'');
-    const sourceLang=sourceLanguage==='english'?'EN':'DE';
-    const responses=await Promise.all(contextsFor(clean,sourceLanguage).map(context=>fetch(`${base}/v2/translate`,{
+    const sourceLang=sourceIsRussian?'RU':sourceLanguage==='english'?'EN':'DE';
+    const targetLang=sourceIsRussian?(sourceLanguage==='english'?'EN-US':'DE'):'RU';
+    const responses=await Promise.all(contextsFor(clean,sourceLanguage,sourceIsRussian).map(context=>fetch(`${base}/v2/translate`,{
       method:'POST',headers:{Authorization:`DeepL-Auth-Key ${key}`,'Content-Type':'application/json'},
-      body:JSON.stringify({text:[clean],source_lang:sourceLang,target_lang:'RU',context}),
+      body:JSON.stringify({text:[clean],source_lang:sourceLang,target_lang:targetLang,context}),
     })));
     if(responses.some(response=>response.status===403))return res.status(403).json({error:'Ключ DeepL недействителен.'});
 
