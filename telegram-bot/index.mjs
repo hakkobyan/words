@@ -164,7 +164,10 @@ async function handleAuthorizedMessage(message) {
   }
 
   if (["start", "help"].includes(command.name)) {
-    await telegram.sendMessage(chatId, HELP, message.message_id);
+    const accessStatus = config.fullAccess
+      ? "Режим доступа: FULL — разрешены изменения файлов и .git только для проекта words."
+      : "Режим доступа: workspace-write — изменения .git могут быть заблокированы.";
+    await telegram.sendMessage(chatId, `${HELP}\n\n${accessStatus}`, message.message_id);
   } else if (command.name === "status") {
     await telegram.sendLongMessage(chatId, await getGitStatus(config.projectRoot), message.message_id);
   } else if (command.name === "diff") {

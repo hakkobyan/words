@@ -16,6 +16,7 @@
 ```dotenv
 TELEGRAM_BOT_TOKEN=1234567890:секретный_токен_от_BotFather
 TELEGRAM_ALLOWED_USER_IDS=ваш_числовой_id
+TELEGRAM_CODEX_FULL_ACCESS=true
 ```
 
 Проект использует закреплённую dev-версию Codex CLI, а текущая авторизация Codex используется автоматически. Если CLI ещё не авторизован, один раз выполните:
@@ -62,7 +63,9 @@ npm run telegram:uninstall-startup
 
 - Запросы принимаются только в личном чате и только от ID из `TELEGRAM_ALLOWED_USER_IDS`.
 - Токен Telegram удаляется из окружения дочернего процесса Codex.
-- Codex запускается в режиме `workspace-write`: изменения разрешены внутри `words`, но не в соседнем `words-expo`.
+- При `TELEGRAM_CODEX_FULL_ACCESS=false` Codex запускается в `workspace-write`; этот режим защищает `.git` от записи.
+- При `TELEGRAM_CODEX_FULL_ACCESS=true` команды `/edit`, `/git` и `/publish` получают `danger-full-access`, необходимый для commit/push. `/read` всегда остаётся read-only.
+- Даже в full-access системная инструкция фиксирует корень `words` и запрещает доступ к соседнему `words-expo`; включайте режим только для личного allowlisted Telegram ID.
 - Сетевой доступ Codex включён для установки зависимостей и явно запрошенных GitHub-действий; сам Telegram-токен дочернему процессу недоступен.
 - Входящие сообщения не выполняются как shell-команды. Они передаются Codex как задачи.
 - Push, PR, merge, deploy и другие внешние действия разрешены только при явной просьбе в конкретном сообщении.

@@ -14,6 +14,11 @@ try {
   console.log(`✅ Бот: @${bot.username}`);
   console.log(`✅ ${codexVersion}`);
   console.log(`✅ Разрешённых Telegram ID: ${config.allowedUserIds.size}`);
+  console.log(
+    config.fullAccess
+      ? "⚠️ Codex full access включён для Telegram-задач"
+      : "✅ Codex работает в ограниченном workspace-write",
+  );
   console.log(`✅ ${gitStatus.split("\n")[0]}`);
 } catch (error) {
   console.error(`❌ ${error.message}`);
