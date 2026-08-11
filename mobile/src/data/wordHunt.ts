@@ -1,8 +1,10 @@
 import {WordHuntLevel} from '@/types';
+import {WORD_HUNT_SOURCE_DETAILS} from '@/data/wordHuntSourceDetails';
 
 export type WordHuntTarget={
   id:string;word:string;translationRu:string;partOfSpeech:string;level:Exclude<WordHuntLevel,'mixed'>;definition:string;pronunciation:string;example:string;
   related:string[];neighbors:Record<string,number>;hints:[string,string,string];categoryId:string;
+  cloze?:string;
   practice:{question:string;options:string[];correctIndex:number;explanation:string};
 };
 
@@ -107,10 +109,10 @@ export const WORD_HUNT_TARGETS:WordHuntTarget[]=[
   },
 ];
 
-function nounTarget(id:string,translationRu:string,level:Exclude<WordHuntLevel,'mixed'>,definition:string,example:string,related:[string,string,string,string],categoryId='other'):WordHuntTarget{
+function nounTarget(id:string,translationRu:string,level:Exclude<WordHuntLevel,'mixed'>,definition:string,example:string,related:[string,string,string,string],categoryId='other',cloze?:string):WordHuntTarget{
   const neighbors=Object.fromEntries(related.map((word,index)=>[word,[9,18,31,47][index]]));
   return {
-    id,word:id,translationRu,partOfSpeech:'noun',level,pronunciation:'',categoryId,definition,example,related,neighbors:{...neighbors,thing:820,action:1260},
+    id,word:id,translationRu,partOfSpeech:'noun',level,pronunciation:'',categoryId,definition,example,cloze,related,neighbors:{...neighbors,thing:820,action:1260},
     hints:['This is a noun.',definition,`Starts with “${id[0]}”.`],
     practice:{question:`Which sentence uses “${id}” correctly?`,options:[example,`She ${id} the report yesterday.`,`They felt very ${id}.`],correctIndex:0,explanation:`“${id}” is used here as a noun.`},
   };
@@ -141,10 +143,11 @@ const IMPORTED_NOUNS:Record<Exclude<WordHuntLevel,'mixed'>,string[]>={
 
 const importedTargets=Object.entries(IMPORTED_NOUNS).flatMap(([level,words])=>words.map((word,index)=>{
   const related=[words[(index+1)%words.length],words[(index+2)%words.length],words[(index+3)%words.length],words[(index+4)%words.length]] as [string,string,string,string];
-  return nounTarget(word,word,level as Exclude<WordHuntLevel,'mixed'>,`An English noun at ${level} level.`,`This vocabulary lesson focuses on the noun “${word}”.`,related);
+  const source=WORD_HUNT_SOURCE_DETAILS[word];
+  return nounTarget(word,word,level as Exclude<WordHuntLevel,'mixed'>,`An English noun at ${level} level.`,source?.example??`This vocabulary lesson focuses on the noun “${word}”.`,related,'other',source?.cloze);
 }));
 
-const NOUN_HUNT_TARGETS=[...WORD_HUNT_TARGETS.filter(target=>target.partOfSpeech==='noun'),...EXTRA_NOUN_TARGETS,...importedTargets]
+export const NOUN_HUNT_TARGETS=[...WORD_HUNT_TARGETS.filter(target=>target.partOfSpeech==='noun'),...EXTRA_NOUN_TARGETS,...importedTargets]
   .filter((target,index,items)=>items.findIndex(item=>item.id===target.id)===index);
 
 export const getDailyHuntTargets=(level:WordHuntLevel='mixed',date=new Date())=>{

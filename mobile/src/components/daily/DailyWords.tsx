@@ -94,6 +94,7 @@ export default function DailyWords({onDone}: {onDone: () => void}) {
   };
 
   const alreadyAdded = added.includes(card.entry.id);
+  const hasRussianTranslation = card.entry.translationRu.trim().toLowerCase() !== card.entry.word.trim().toLowerCase();
   const expected = card.direction === 'toRu' ? card.entry.translationRu : card.entry.word;
   const fieldTone = verdict === 'right' ? 'bg-correct-bg' : verdict === 'wrong' ? 'bg-wrong-bg' : 'bg-card-strong';
 
@@ -107,11 +108,13 @@ export default function DailyWords({onDone}: {onDone: () => void}) {
 
       <View className="items-center py-2">
         <Text className="text-muted text-sm text-center">
-          {card.direction === 'toRu'
+          {card.direction === 'cloze'
+            ? pick('Вставьте английское слово в предложение', 'Complete the sentence with the English word')
+            : card.direction === 'toRu'
             ? pick(`Переведите с ${fromName} на русский`, 'Translate into Russian')
             : pick(`Переведите на ${toName}`, `Translate into ${toName}`)}
         </Text>
-        <Text className="text-4xl font-black text-ink py-5 text-center">{promptFor(card)}</Text>
+        <Text className={`${card.direction === 'cloze' ? 'text-2xl leading-8' : 'text-4xl'} font-black text-ink py-5 text-center`}>{promptFor(card)}</Text>
       </View>
 
       <TextInput
@@ -121,7 +124,7 @@ export default function DailyWords({onDone}: {onDone: () => void}) {
         editable={verdict === 'none'}
         onSubmitEditing={() => (verdict === 'none' ? check() : next())}
         returnKeyType={verdict === 'none' ? 'done' : 'next'}
-        placeholder={pick('Ваш перевод…', 'Your translation…')}
+        placeholder={card.direction === 'cloze' ? pick('Пропущенное слово…', 'Missing word…') : pick('Ваш перевод…', 'Your translation…')}
         placeholderTextColor={colors.placeholder}
         className={`min-h-12 border border-line rounded-2xl px-4 text-ink ${fieldTone}`}
       />
@@ -141,14 +144,16 @@ export default function DailyWords({onDone}: {onDone: () => void}) {
               {pick('Правильный ответ:', 'Correct answer:')} {expected}
             </Text>
           </View>
-          <Button
-            variant="secondary"
-            fullWidth
-            disabled={alreadyAdded}
-            icon={alreadyAdded ? <Check size={18} color={colors.green} /> : <Plus size={18} color={colors.green} />}
-            label={alreadyAdded ? pick('Добавлено в словарь', 'Added to dictionary') : pick('Добавить это слово в словарь', 'Add this word to my dictionary')}
-            onPress={addToDictionary}
-          />
+          {hasRussianTranslation && (
+            <Button
+              variant="secondary"
+              fullWidth
+              disabled={alreadyAdded}
+              icon={alreadyAdded ? <Check size={18} color={colors.green} /> : <Plus size={18} color={colors.green} />}
+              label={alreadyAdded ? pick('Добавлено в словарь', 'Added to dictionary') : pick('Добавить это слово в словарь', 'Add this word to my dictionary')}
+              onPress={addToDictionary}
+            />
+          )}
         </View>
       )}
 
