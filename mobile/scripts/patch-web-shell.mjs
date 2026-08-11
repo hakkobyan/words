@@ -5,8 +5,8 @@
 // UI depends on stored state and the resulting hydration mismatches throw. So
 // the three head changes it needs are applied here instead:
 //
-//   viewport-fit=cover  iOS hands the page the notch and home-indicator areas
-//                       only with this, and safe-area insets stay 0 without it.
+//   viewport            iOS hands the page the notch and home-indicator areas,
+//                       while fixed scaling keeps the installed app app-like.
 //   theme-color         tints the browser chrome; the root layout keeps it in
 //                       sync with the active theme once the app has booted.
 //   background-color    those strips otherwise fall back to the document's
@@ -22,7 +22,9 @@ const PAPER_DARK = '#1d1714';
 // and exposes the blank area around it, and taps carry the browser's 300ms
 // double-tap delay.
 const css = [
-  `html,body{background-color:${PAPER};}`,
+  `html,body,#root{width:100%;height:100%;min-height:100%;}`,
+  `html,body{background-color:${PAPER};overflow:hidden;}`,
+  `body{min-height:100dvh;}`,
   `html.dark,html.dark body{background-color:${PAPER_DARK};}`,
   `html,body{overscroll-behavior:none;}`,
   `body{-webkit-tap-highlight-color:transparent;touch-action:manipulation;}`,
@@ -49,14 +51,27 @@ if (!html.includes('name="viewport"')) throw new Error('no viewport meta in dist
 
 let patched = html.replace(
   /(<meta name="viewport" content=")([^"]*)(")/,
-  (_match, open, content, close) => open + (content.includes('viewport-fit') ? content : `${content}, viewport-fit=cover`) + close,
+  (_match, open, content, close) => {
+    const settings = content
+      .split(',')
+      .map((setting) => setting.trim())
+      .filter((setting) => !/^(maximum-scale|user-scalable|viewport-fit)\s*=/.test(setting));
+
+    settings.push('maximum-scale=1', 'user-scalable=no', 'viewport-fit=cover');
+    return `${open}${settings.join(', ')}${close}`;
+  },
 );
 
 if (!patched.includes('id="safe-area-background"')) patched = patched.replace('</head>', `${head}</head>`);
 
-if (!patched.includes('viewport-fit=cover') || !patched.includes('id="safe-area-background"')) {
+if (
+  !patched.includes('maximum-scale=1') ||
+  !patched.includes('user-scalable=no') ||
+  !patched.includes('viewport-fit=cover') ||
+  !patched.includes('id="safe-area-background"')
+) {
   throw new Error('failed to patch dist/index.html');
 }
 
 await writeFile(FILE, patched);
-console.log('patched dist/index.html: viewport-fit, theme-color, safe-area background');
+console.log('patched dist/index.html: fixed viewport, fullscreen shell, theme-color, safe-area background');
