@@ -4,7 +4,12 @@
   "private": true,
   "scripts": {
     "build": "npm --prefix mobile install --legacy-peer-deps && npm --prefix mobile run build:web",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "telegram:bot": "node --env-file-if-exists=.env telegram-bot/index.mjs",
+    "telegram:doctor": "node --env-file-if-exists=.env telegram-bot/doctor.mjs",
+    "telegram:test": "node --test telegram-bot/test/config.test.mjs telegram-bot/test/utils.test.mjs",
+    "telegram:install-startup": "powershell -NoProfile -ExecutionPolicy Bypass -File telegram-bot/install-startup.ps1",
+    "telegram:uninstall-startup": "powershell -NoProfile -ExecutionPolicy Bypass -File telegram-bot/uninstall-startup.ps1"
   },
   "dependencies": {
     "an-array-of-english-words": "^2.0.0",
@@ -12,6 +17,7 @@
     "undici": "^8.10.0"
   },
   "devDependencies": {
+    "@openai/codex": "0.147.0",
     "@types/node": "^22.10.2",
     "@vercel/node": "^5.3.24",
     "typescript": "~5.9.2"
