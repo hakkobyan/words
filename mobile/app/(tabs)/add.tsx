@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { Check, Plus, Sparkles } from 'lucide-react-native';
 import { useVocabularyStore } from '@/store/useVocabularyStore';
@@ -8,6 +8,8 @@ import { dataSet } from '@/lib/web';
 import { useI18n } from '@/lib/i18n';
 import { useThemeColors } from '@/lib/theme';
 import { translateWord } from '@/lib/api';
+
+const isRussianText = (value: string) => /[\u0400-\u04ff]/.test(value);
 
 export default function Add() {
   const s = useVocabularyStore();
@@ -25,12 +27,18 @@ export default function Add() {
   const [msgIsError, setMsgIsError] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const skipNextLookup = useRef(false);
   const validSessions = s.sessions.filter((x) => x.language === lang);
   const activeSession = validSessions.some((x) => x.id === session) ? session : '';
+  const inputIsRussian = isRussianText(word);
 
   useEffect(() => {
     const clean = word.trim();
     setSuggestions([]);
+    if (skipNextLookup.current) {
+      skipNextLookup.current = false;
+      return;
+    }
     if (clean.length < 2) return;
     const controller = new AbortController();
     const timer = setTimeout(async () => {
@@ -60,16 +68,19 @@ export default function Add() {
       setMsgIsError(true);
       return;
     }
+    const russianFirst = isRussianText(word);
+    const savedWord = (russianFirst ? tr : word).trim();
+    const savedTranslation = (russianFirst ? word : tr).trim();
     const sid = activeSession || validSessions[0]?.id || s.addSession(`${lang === 'english' ? 'Английский' : 'Немецкий'} — ${new Date().toLocaleString('ru')}`, lang);
-    if (s.words.some((w) => w.language === lang && w.word.trim().toLocaleLowerCase() === word.trim().toLocaleLowerCase())) {
+    if (s.words.some((w) => w.language === lang && w.word.trim().toLocaleLowerCase() === savedWord.toLocaleLowerCase())) {
       setMsg(pick('Это слово уже добавлено в ваш словарь.', 'This word is already in your dictionary.'));
       setMsgIsError(true);
       return;
     }
     s.addWord({
       language: lang,
-      word: word.trim(),
-      translationRu: tr.trim(),
+      word: savedWord,
+      translationRu: savedTranslation,
       categoryId: cat,
       sessionId: sid,
       example,
@@ -98,7 +109,9 @@ export default function Add() {
 
       <Card className="p-4 gap-4">
         <View className="gap-2">
-          <Text className="font-bold text-sm text-ink">{lang === 'english' ? pick('Английское слово', 'English word') : pick('Немецкое слово', 'German word')}</Text>
+          <Text className="font-bold text-sm text-ink">
+            {lang === 'english' ? pick('Английское или русское слово', 'English or Russian word') : pick('Немецкое или русское слово', 'German or Russian word')}
+          </Text>
           <View className="relative">
             <TextInput
               autoFocus
@@ -107,7 +120,7 @@ export default function Add() {
                 setWord(v);
                 setMsg('');
               }}
-              placeholder={lang === 'english' ? 'Например, journey' : 'Например, Reise'}
+              placeholder={lang === 'english' ? pick('Например, journey или путешествие', 'For example, journey or путешествие') : pick('Например, Reise или путешествие', 'For example, Reise or путешествие')}
               autoCapitalize="none"
               autoCorrect={false}
               className="min-h-12 bg-card-strong border border-line rounded-2xl px-4 pr-12 text-ink"
@@ -127,7 +140,14 @@ export default function Add() {
               <Pressable
                 key={x}
                 onPress={() => {
-                  setTr(x);
+                  if (inputIsRussian) {
+                    skipNextLookup.current = true;
+                    setTr(word.trim());
+                    setWord(x);
+                    setSuggestions([]);
+                  } else {
+                    setTr(x);
+                  }
                   setMsg(pick('Перевод выбран.', 'Translation selected.'));
                 }}
                 className="min-h-12 bg-card-strong rounded-2xl px-4 flex-row items-center justify-between"
@@ -140,7 +160,13 @@ export default function Add() {
         )}
 
         <View className="gap-2">
-          <Text className="font-bold text-sm text-ink">{pick('Перевод на русский', 'Russian translation')}</Text>
+          <Text className="font-bold text-sm text-ink">
+            {inputIsRussian
+              ? lang === 'english'
+                ? pick('Перевод на английский', 'English translation')
+                : pick('Перевод на немецкий', 'German translation')
+              : pick('Перевод на русский', 'Russian translation')}
+          </Text>
           <TextInput
             value={tr}
             onChangeText={setTr}

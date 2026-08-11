@@ -125,7 +125,7 @@ export default function Flashcards() {
         <Text className="text-muted">{Math.round((i / cards.length) * 100)}%</Text>
       </View>
       <Progress value={(i / cards.length) * 100} />
-      <Pressable onPress={() => setFlip(!flip)} className="flex-1 mt-6" style={{ minHeight: 380 }}>
+      <Pressable onPress={() => setFlip(!flip)} className="mt-6" style={{ height: 380 }}>
         <Animated.View style={[frontStyle, { position: 'absolute', width: '100%', minHeight: 380 }]}>
           <Card className="p-8 items-center justify-center flex-1">
             <Pill>{w.language === 'english' ? 'EN' : 'DE'}</Pill>
