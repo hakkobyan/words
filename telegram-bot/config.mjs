@@ -21,6 +21,14 @@ export function parseAllowedUserIds(value) {
   return new Set(ids);
 }
 
+export function parseBoolean(value, fallback = false) {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  if (!normalized) return fallback;
+  if (["1", "true", "yes", "on"].includes(normalized)) return true;
+  if (["0", "false", "no", "off"].includes(normalized)) return false;
+  throw new Error(`Ожидалось логическое значение true/false, получено: ${value}`);
+}
+
 export function loadConfig(environment = process.env) {
   const token = String(environment.TELEGRAM_BOT_TOKEN ?? "").trim();
   if (!/^\d+:[A-Za-z0-9_-]{20,}$/.test(token)) {
@@ -31,6 +39,7 @@ export function loadConfig(environment = process.env) {
     token,
     allowedUserIds: parseAllowedUserIds(environment.TELEGRAM_ALLOWED_USER_IDS),
     model: String(environment.TELEGRAM_CODEX_MODEL ?? "").trim() || null,
+    fullAccess: parseBoolean(environment.TELEGRAM_CODEX_FULL_ACCESS, false),
     projectRoot,
     stateFile,
   };

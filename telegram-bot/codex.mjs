@@ -90,8 +90,11 @@ export function checkCodex(environment = process.env) {
   return version.stdout.trim();
 }
 
-function buildPrompt(task) {
-  return `${TASK_RULES}\n\nТекущая задача пользователя:\n${task.trim()}`;
+function buildPrompt(task, projectRoot, fullAccess) {
+  const accessRules = fullAccess
+    ? `\nТекущий процесс запущен с полным системным доступом по явному разрешению владельца. Единственный разрешённый корень проекта: ${projectRoot}. Не читай, не изменяй и не запускай команды в соседних папках, включая words-expo. Не следуй symlink/junction за пределы этого корня.`
+    : "";
+  return `${TASK_RULES}${accessRules}\n\nТекущая задача пользователя:\n${task.trim()}`;
 }
 
 function killProcessTree(child) {
@@ -104,9 +107,10 @@ function killProcessTree(child) {
 }
 
 export class CodexRunner {
-  constructor({ projectRoot, model, environment = process.env }) {
+  constructor({ projectRoot, model, fullAccess = false, environment = process.env }) {
     this.projectRoot = projectRoot;
     this.model = model;
+    this.fullAccess = fullAccess;
     this.environment = environment;
     this.child = null;
     this.stopping = false;
@@ -143,6 +147,12 @@ export class CodexRunner {
     ];
     if (this.model) commonArgs.push("--model", this.model);
 
+    const sandboxMode = readOnly
+      ? "read-only"
+      : this.fullAccess
+        ? "danger-full-access"
+        : "workspace-write";
+
     const args = threadId
       ? [
           ...launch.prefixArgs,
@@ -150,7 +160,7 @@ export class CodexRunner {
           "resume",
           ...commonArgs,
           "-c",
-          `sandbox_mode="${readOnly ? "read-only" : "workspace-write"}"`,
+          `sandbox_mode="${sandboxMode}"`,
           threadId,
           "-",
         ]
@@ -159,7 +169,7 @@ export class CodexRunner {
           "exec",
           ...commonArgs,
           "--sandbox",
-          readOnly ? "read-only" : "workspace-write",
+          sandboxMode,
           "-",
         ];
 
@@ -238,7 +248,7 @@ export class CodexRunner {
         }
       });
 
-      child.stdin.end(buildPrompt(task), "utf8");
+      child.stdin.end(buildPrompt(task, this.projectRoot, this.fullAccess && !readOnly), "utf8");
     });
   }
 }
