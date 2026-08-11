@@ -1,4 +1,5 @@
 import {BankWord,wordBank} from '@/data/wordBank';
+import {NOUN_HUNT_TARGETS} from '@/data/wordHunt';
 import {shuffle} from '@/lib/shuffle';
 import {CefrLevel,StudyLanguage,UserWord} from '@/types';
 
@@ -17,14 +18,19 @@ export const dailySession={
   markHandled(){handled=true;listeners.forEach(listener=>listener())},
 };
 
-/** Which way round a card is asked. `toRu`: show the foreign word, type the Russian. */
-export type Direction='toRu'|'fromRu';
-export interface DailyCard{entry:BankWord;direction:Direction}
+export interface DailyEntry extends BankWord{cloze?:string}
+
+/** Translation cards work both ways; imported Word Hunt nouns use a source sentence. */
+export type Direction='toRu'|'fromRu'|'cloze';
+export interface DailyCard{entry:DailyEntry;direction:Direction}
 
 /** Every Russian spelling accepted for an entry. */
 export const russianAnswers=(entry:BankWord)=>[entry.translationRu,...(entry.alt||[])];
 
-export function promptFor(card:DailyCard){return card.direction==='toRu'?card.entry.word:card.entry.translationRu}
+export function promptFor(card:DailyCard){
+  if(card.direction==='cloze')return card.entry.cloze??card.entry.word;
+  return card.direction==='toRu'?card.entry.word:card.entry.translationRu;
+}
 export function answersFor(card:DailyCard){return card.direction==='toRu'?russianAnswers(card.entry):[card.entry.word]}
 
 /**
@@ -35,11 +41,18 @@ export function answersFor(card:DailyCard){return card.direction==='toRu'?russia
  */
 export function pickDailyWords(language:StudyLanguage,level:CefrLevel,seenIds:string[],ownedWords:UserWord[]):DailyCard[]{
   const owned=new Set(ownedWords.filter(word=>word.language===language).map(word=>word.word.trim().toLowerCase()));
-  const levelWords=wordBank[language].filter(entry=>entry.level===level);
+  const bank:DailyEntry[]=language==='english'
+    ?NOUN_HUNT_TARGETS.map(target=>({id:`english:${target.id}`,word:target.word,translationRu:target.translationRu,level:target.level,categoryId:target.categoryId,cloze:target.cloze}))
+    :wordBank[language];
+  const levelWords=bank.filter(entry=>entry.level===level);
   const unowned=levelWords.filter(entry=>!owned.has(entry.word.toLowerCase()));
   const eligible=unowned.length>=DAILY_COUNT?unowned:levelWords;
   const seen=new Set(seenIds);
   const fresh=eligible.filter(entry=>!seen.has(entry.id));
   const pool=fresh.length>=DAILY_COUNT?fresh:eligible;
-  return shuffle(pool).slice(0,DAILY_COUNT).map(entry=>({entry,direction:(Math.random()<0.5?'toRu':'fromRu') as Direction}));
+  return shuffle(pool).slice(0,DAILY_COUNT).map(entry=>{
+    const hasRussianTranslation=entry.translationRu.trim().toLowerCase()!==entry.word.trim().toLowerCase();
+    const direction:Direction=!hasRussianTranslation&&entry.cloze?'cloze':Math.random()<0.5?'toRu':'fromRu';
+    return {entry,direction};
+  });
 }
