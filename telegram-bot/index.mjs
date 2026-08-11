@@ -2,14 +2,18 @@ import { loadConfig } from "./config.mjs";
 import { checkCodex, CodexRunner } from "./codex.mjs";
 import { getGitDiff, getGitLog, getGitStatus } from "./git.mjs";
 import { loadState, saveState } from "./state.mjs";
+import { createGitTask, createPublishTask } from "./tasks.mjs";
 import { TelegramClient } from "./telegram.mjs";
 import { parseCommand, shorten } from "./utils.mjs";
 
 const HELP = `Управление проектом words
 
-Отправьте обычное текстовое сообщение — это будет новая задача Codex с правом изменять файлы только в этом репозитории.
+Отправьте обычное текстовое сообщение или /edit задача — Codex изменит только проект words, проверит результат и вернёт отчёт.
 
+/edit задача — изменить код, дизайн или данные проекта
 /read задача — только изучить проект, без изменений
+/git задача — выполнить указанную Git/GitHub-операцию
+/publish описание — проверить изменения, сделать commit, push, PR и merge после зелёных checks
 /status — текущая ветка и изменённые файлы
 /diff — посмотреть локальные изменения
 /log — последние 10 коммитов
@@ -17,7 +21,7 @@ const HELP = `Управление проектом words
 /stop — остановить текущую задачу и очистить очередь
 /help — эта справка
 
-Бот принимает команды только от разрешённого Telegram ID. Публикация, push, PR, merge и deploy выполняются только когда вы явно просите об этом в самой задаче.`;
+Бот принимает команды только от разрешённого Telegram ID. Raw shell недоступен. Force push, reset и удаление файлов не выполняются без точной явной просьбы.`;
 
 const config = loadConfig();
 checkCodex();
@@ -59,9 +63,15 @@ function updateProgress(chatId, messageId, event, progress) {
 }
 
 async function executeTask(job) {
+  const startLabels = {
+    edit: "✏️ Изменяю проект words…",
+    git: "🌿 Выполняю Git/GitHub-задачу…",
+    publish: "🚀 Проверяю и публикую изменения…",
+    read: "🔎 Изучаю проект…",
+  };
   const progressMessage = await telegram.sendMessage(
     job.chatId,
-    job.readOnly ? "🔎 Изучаю проект…" : "⏳ Работаю над проектом…",
+    startLabels[job.kind] || "⏳ Работаю над проектом…",
     job.messageId,
   );
   const progress = { label: "", lastUpdate: 0, finished: false, pending: Promise.resolve() };
@@ -83,6 +93,10 @@ async function executeTask(job) {
     await progress.pending;
     await telegram.editMessage(job.chatId, progressMessage.message_id, "✅ Готово").catch(() => {});
     await telegram.sendLongMessage(job.chatId, result.finalMessage, job.messageId);
+    if (!job.readOnly) {
+      const gitStatus = await getGitStatus(config.projectRoot).catch(() => null);
+      if (gitStatus) await telegram.sendLongMessage(job.chatId, `Текущий Git-статус:\n${gitStatus}`);
+    }
   } catch (error) {
     const stopped = error?.code === "STOPPED";
     progress.finished = true;
@@ -139,7 +153,13 @@ async function handleAuthorizedMessage(message) {
   }
 
   if (!command) {
-    await enqueueTask({ chatId, messageId: message.message_id, task: text, readOnly: false });
+    await enqueueTask({
+      chatId,
+      messageId: message.message_id,
+      task: text,
+      readOnly: false,
+      kind: "edit",
+    });
     return;
   }
 
@@ -160,8 +180,45 @@ async function handleAuthorizedMessage(message) {
         messageId: message.message_id,
         task: command.argument,
         readOnly: true,
+        kind: "read",
       });
     }
+  } else if (command.name === "edit") {
+    if (!command.argument) {
+      await telegram.sendMessage(chatId, "Напишите задачу после /edit.", message.message_id);
+    } else {
+      await enqueueTask({
+        chatId,
+        messageId: message.message_id,
+        task: command.argument,
+        readOnly: false,
+        kind: "edit",
+      });
+    }
+  } else if (command.name === "git") {
+    if (!command.argument) {
+      await telegram.sendMessage(
+        chatId,
+        "Напишите Git-задачу после /git, например: /git создай ветку codex/fix-menu и закоммить изменения.",
+        message.message_id,
+      );
+    } else {
+      await enqueueTask({
+        chatId,
+        messageId: message.message_id,
+        task: createGitTask(command.argument),
+        readOnly: false,
+        kind: "git",
+      });
+    }
+  } else if (command.name === "publish") {
+    await enqueueTask({
+      chatId,
+      messageId: message.message_id,
+      task: createPublishTask(command.argument),
+      readOnly: false,
+      kind: "publish",
+    });
   } else if (command.name === "new") {
     if (codex.isRunning || pending.length) {
       await telegram.sendMessage(chatId, "Сначала остановите текущую работу командой /stop.", message.message_id);
