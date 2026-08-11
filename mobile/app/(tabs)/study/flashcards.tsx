@@ -7,10 +7,13 @@ import { Card, Progress, Button, Pill } from '@/components/ui/Parts';
 import { shuffle } from '@/lib/shuffle';
 import { UserWord } from '@/types';
 import { useI18n } from '@/lib/i18n';
+import { useScreenPadding } from '@/lib/insets';
+import { dataSet } from '@/lib/web';
 
 export default function Flashcards() {
   const s = useVocabularyStore();
   const { pick } = useI18n();
+  const screenPadding = useScreenPadding();
   const { category, session } = useLocalSearchParams<{ category?: string; session?: string }>();
   const [cards, setCards] = useState<UserWord[]>([]);
   const [ready, setReady] = useState(false);
@@ -110,7 +113,11 @@ export default function Flashcards() {
   };
 
   return (
-    <View className="flex-1 w-full max-w-[720px] self-center bg-paper p-5">
+    <View
+      {...dataSet({ screenPad: 'true' })}
+      className="flex-1 w-full max-w-[720px] self-center bg-paper p-5"
+      style={screenPadding}
+    >
       <View className="flex-row justify-between mb-3">
         <Text className="font-bold text-ink">
           {i + 1} {pick('из', 'of')} {cards.length}
