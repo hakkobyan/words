@@ -2,13 +2,13 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "words-expo-web",
+      "name": "flipfox-web",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["expo", "start", "--web"],
       "port": 8081
     },
     {
-      "name": "words-expo-native",
+      "name": "flipfox-native",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["expo", "start"],
       "port": 8081

@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "words-expo-native",
+      "name": "flipfox-native",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "run",
@@ -12,7 +12,7 @@
       "port": 8081
     },
     {
-      "name": "words-static",
+      "name": "flipfox-static",
       "runtimeExecutable": "npx",
       "runtimeArgs": [
         "--yes",
