@@ -46,10 +46,11 @@ export default function Add() {
       try {
         const result = await translateWord(clean, lang, controller.signal);
         setSuggestions(result);
+        if (result[0]) setTr((current) => current.trim() ? current : result[0]);
       } catch (e) {
         if ((e as Error).name !== 'AbortError') {
           setMsg(pick('Переводчик временно недоступен. Можно ввести перевод вручную.', 'Translator is temporarily unavailable. You can type the translation yourself.'));
-          setMsgIsError(false);
+          setMsgIsError(true);
         }
       } finally {
         setLoading(false);
