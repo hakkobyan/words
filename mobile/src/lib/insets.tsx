@@ -33,3 +33,9 @@ export function useScreenPadding() {
   const insets = useRealInsets();
   return {paddingTop: insets.top + EDGE, paddingBottom: TAB_BAR_HEIGHT + insets.bottom + EDGE};
 }
+
+/** Safe padding for full-screen flows that do not render the tab bar. */
+export function useStandaloneScreenPadding(edge = EDGE) {
+  const insets = useRealInsets();
+  return {paddingTop: insets.top + edge, paddingBottom: insets.bottom + edge};
+}

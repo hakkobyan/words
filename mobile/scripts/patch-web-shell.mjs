@@ -39,6 +39,8 @@ const css = [
   // Screen content clears the status bar and the menu while still scrolling
   // under both — 62px is the tab bar, 16px the screen's own edge padding.
   `[data-screen-pad]{padding-top:calc(16px + env(safe-area-inset-top))!important;padding-bottom:calc(78px + env(safe-area-inset-bottom))!important;}`,
+  // Standalone headers must keep controls and text below the status bar.
+  `[data-safe-header]{padding-top:calc(12px + env(safe-area-inset-top))!important;}`,
   // Keeps the overflow button clear of the status bar.
   `[data-safe-top-offset]{top:calc(12px + env(safe-area-inset-top))!important;}`,
 ].join('');

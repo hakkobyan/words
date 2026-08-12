@@ -40,9 +40,6 @@ export default function RootLayout() {
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', colors.paper);
   }, [colors.paper]);
 
-  if (isHydrated && !onboardingCompleted) return <Onboarding />;
-  if (isHydrated && !dailyDone) return <DailyWords onDone={dailySession.markHandled} />;
-
   // Without these the header keeps its platform default — a light grey bar that
   // ignores the theme — and the titles were hardcoded Russian regardless of the
   // interface language.
@@ -61,14 +58,20 @@ export default function RootLayout() {
         backgroundColor="transparent"
         barStyle={isDark ? 'light-content' : 'dark-content'}
       />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.paper } }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="categories/index" options={{ ...header, title: pick('Категории', 'Categories') }} />
-        <Stack.Screen name="categories/[categoryId]" options={{ ...header, title: '' }} />
-        <Stack.Screen name="sessions" options={{ ...header, title: pick('Сеансы', 'Sessions') }} />
-        <Stack.Screen name="settings" options={{ ...header, title: pick('Настройки', 'Settings') }} />
-        <Stack.Screen name="explore" options={{ headerShown: false }} />
-      </Stack>
+      {isHydrated && !onboardingCompleted ? (
+        <Onboarding />
+      ) : isHydrated && !dailyDone ? (
+        <DailyWords onDone={dailySession.markHandled} />
+      ) : (
+        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.paper } }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="categories/index" options={{ ...header, title: pick('Категории', 'Categories') }} />
+          <Stack.Screen name="categories/[categoryId]" options={{ ...header, title: '' }} />
+          <Stack.Screen name="sessions" options={{ ...header, title: pick('Сеансы', 'Sessions') }} />
+          <Stack.Screen name="settings" options={{ ...header, title: pick('Настройки', 'Settings') }} />
+          <Stack.Screen name="explore" options={{ headerShown: false }} />
+        </Stack>
+      )}
     </RealInsetsProvider>
   );
 }

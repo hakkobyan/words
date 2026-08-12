@@ -11,6 +11,8 @@ import {useI18n} from '@/lib/i18n';
 import {useVocabularyStore} from '@/store/useVocabularyStore';
 import {WordHuntTarget} from '@/data/wordHunt';
 import {WordHuntLevel} from '@/types';
+import {useRealInsets} from '@/lib/insets';
+import {dataSet} from '@/lib/web';
 
 const proximityCopy:Record<Proximity,[string,string]>={
   correct:['Найдено','Found'],
@@ -24,13 +26,18 @@ export default function Explore(){
   const game=useSemanticGame();
   const colors=useThemeColors();
   const {pick}=useI18n();
+  const insets=useRealInsets();
   const completed=game.completedToday.length;
   const total=game.targets.length;
   const scrollRef=useRef<ScrollView>(null);
   useEffect(()=>{scrollRef.current?.scrollTo({y:0,animated:true})},[game.status]);
 
   return <KeyboardAvoidingView className="flex-1 bg-paper" behavior={Platform.OS==='ios'?'padding':undefined}>
-    <View className="flex-row items-center justify-between px-4 pt-3 pb-3 border-b border-line bg-card">
+    <View
+      {...dataSet({safeHeader:'true'})}
+      className="flex-row items-center justify-between px-4 pb-3 border-b border-line bg-card"
+      style={{paddingTop:insets.top+12}}
+    >
       <Pressable accessibilityRole="button" accessibilityLabel={pick('Назад','Back')} onPress={()=>router.back()} className="w-11 h-11 rounded-full border border-line items-center justify-center active:opacity-70"><ArrowLeft size={20} color={colors.ink}/></Pressable>
       <View className="items-center"><Text className="text-ink font-black">Semantic Word Hunt</Text><Text className="text-muted text-xs">{pick('Экспедиция дня','Today’s expedition')} · {completed}/{total}</Text></View>
       <View className="w-11 h-11 rounded-full bg-mint items-center justify-center"><Flame size={19} color={colors.green}/></View>
