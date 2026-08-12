@@ -7,6 +7,7 @@ import {useThemeColors} from '@/lib/theme';
 import {Button, Card, Pill, Progress} from '@/components/ui/Parts';
 import {isCorrectAnswer} from '@/lib/answers';
 import {DailyCard, answersFor, pickDailyWords, promptFor} from '@/lib/dailyWords';
+import {useStandaloneScreenPadding} from '@/lib/insets';
 
 export default function DailyWords({onDone}: {onDone: () => void}) {
   const store = useVocabularyStore();
@@ -170,9 +171,10 @@ export default function DailyWords({onDone}: {onDone: () => void}) {
 }
 
 function Shell({children}: {children: React.ReactNode}) {
+  const safePadding = useStandaloneScreenPadding(16);
   return (
     <View className="flex-1 bg-paper">
-      <ScrollView contentContainerClassName="flex-grow justify-center p-4">
+      <ScrollView contentContainerStyle={safePadding} contentContainerClassName="flex-grow justify-center px-4">
         <Card className="p-6 gap-5">{children}</Card>
       </ScrollView>
     </View>

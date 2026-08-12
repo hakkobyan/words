@@ -9,6 +9,7 @@ import {levelTestWords, scoreToLevel} from '@/data/levelTest';
 import {isCorrectAnswer} from '@/lib/answers';
 import {dailySession} from '@/lib/dailyWords';
 import {CEFR_LEVELS, CefrLevel, StudyLanguage} from '@/types';
+import {useStandaloneScreenPadding} from '@/lib/insets';
 
 const levelHints: Record<CefrLevel, [string, string]> = {
   A1: ['Начинающий', 'Beginner'],
@@ -25,6 +26,7 @@ export default function Onboarding() {
   const setSettings = useVocabularyStore((s) => s.setSettings);
   const {pick} = useI18n();
   const colors = useThemeColors();
+  const safePadding = useStandaloneScreenPadding(32);
   const [step, setStep] = useState<Step>('welcome');
   const [language, setLanguage] = useState<StudyLanguage>('english');
   const [testIndex, setTestIndex] = useState(0);
@@ -55,7 +57,7 @@ export default function Onboarding() {
 
   return (
     <View className="flex-1 bg-paper">
-      <ScrollView contentContainerClassName="flex-grow justify-center px-4 py-8">
+      <ScrollView contentContainerStyle={safePadding} contentContainerClassName="flex-grow justify-center px-4">
         <View className="w-full max-w-[520px] self-center gap-5">
           <View className="flex-row items-center justify-between px-1">
             <View className="flex-row items-center gap-2">
