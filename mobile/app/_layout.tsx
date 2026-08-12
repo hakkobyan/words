@@ -48,6 +48,7 @@ export default function RootLayout() {
     headerStyle: { backgroundColor: colors.card },
     headerTintColor: colors.green,
     headerTitleStyle: { color: colors.ink, fontWeight: '700' as const },
+    headerBackButtonDisplayMode: 'minimal' as const,
     headerShadowVisible: false,
   };
 
