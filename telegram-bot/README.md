@@ -40,7 +40,7 @@ npm run telegram:bot
 npm run telegram:install-startup
 ```
 
-Скрипт создаст ограниченную задачу Windows `WordsTelegramBot` для текущего пользователя и сразу запустит её. Удаление автозапуска:
+Скрипт создаст ограниченную задачу Windows `WordsTelegramBot` для текущего пользователя и сразу запустит её. Задача работает и от сети, и от батареи. Удаление автозапуска:
 
 ```powershell
 npm run telegram:uninstall-startup
