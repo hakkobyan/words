@@ -1,14 +1,18 @@
+import { mkdtemp, rm } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+
 import { loadConfig } from "./config.mjs";
 import { checkCodex, CodexRunner } from "./codex.mjs";
 import { getGitDiff, getGitLog, getGitStatus } from "./git.mjs";
 import { loadState, saveState } from "./state.mjs";
 import { createGitTask, createPublishTask } from "./tasks.mjs";
-import { TelegramClient } from "./telegram.mjs";
+import { MAX_TELEGRAM_IMAGE_BYTES, TelegramClient } from "./telegram.mjs";
 import { parseCommand, shorten } from "./utils.mjs";
 
 const HELP = `Управление проектом words
 
-Отправьте обычное текстовое сообщение или /edit задача — Codex изменит только проект words, проверит результат и вернёт отчёт.
+Отправьте текст или фото с подписью-задачей — Codex изучит изображение, изменит только проект words, проверит результат и вернёт отчёт.
 
 /edit задача — изменить код, дизайн или данные проекта
 /read задача — только изучить проект, без изменений
@@ -33,6 +37,8 @@ const pending = [];
 let draining = false;
 let closing = false;
 let stateWrite = Promise.resolve();
+
+const DEFAULT_PHOTO_TASK = "Изучи прикреплённую фотографию, определи, что на ней важно для проекта words, и дай полезный ответ.";
 
 async function persistState() {
   const snapshot = { ...state };
@@ -75,12 +81,19 @@ async function executeTask(job) {
     job.messageId,
   );
   const progress = { label: "", lastUpdate: 0, finished: false, pending: Promise.resolve() };
+  let mediaDirectory = null;
 
   try {
+    const imagePaths = [];
+    if (job.imageFileId) {
+      mediaDirectory = await mkdtemp(path.join(os.tmpdir(), "words-telegram-"));
+      imagePaths.push(await telegram.downloadImage(job.imageFileId, mediaDirectory));
+    }
     const result = await codex.run({
       task: job.task,
       threadId: job.readOnly ? null : state.threadId,
       readOnly: job.readOnly,
+      imagePaths,
       onEvent: (event) => {
         updateProgress(job.chatId, progressMessage.message_id, event, progress);
       },
@@ -111,6 +124,8 @@ async function executeTask(job) {
     if (!stopped) {
       await telegram.sendLongMessage(job.chatId, `Ошибка: ${shorten(error.message)}`, job.messageId);
     }
+  } finally {
+    if (mediaDirectory) await rm(mediaDirectory, { recursive: true, force: true }).catch(() => {});
   }
 }
 
@@ -144,11 +159,17 @@ async function enqueueTask(job) {
 
 async function handleAuthorizedMessage(message) {
   const chatId = message.chat.id;
-  const text = String(message.text ?? "").trim();
+  const text = String(message.text ?? message.caption ?? "").trim();
+  const photo = Array.isArray(message.photo) ? message.photo.at(-1) : null;
   const command = parseCommand(text);
 
-  if (!text) {
-    await telegram.sendMessage(chatId, "Сейчас бот принимает только текстовые задачи.", message.message_id);
+  if (!text && !photo) {
+    await telegram.sendMessage(chatId, "Отправьте текстовую задачу или фото с подписью.", message.message_id);
+    return;
+  }
+
+  if (photo?.file_size > MAX_TELEGRAM_IMAGE_BYTES) {
+    await telegram.sendMessage(chatId, "Фотография больше 20 МБ. Отправьте её в меньшем размере.", message.message_id);
     return;
   }
 
@@ -156,7 +177,8 @@ async function handleAuthorizedMessage(message) {
     await enqueueTask({
       chatId,
       messageId: message.message_id,
-      task: text,
+      task: text || DEFAULT_PHOTO_TASK,
+      imageFileId: photo?.file_id,
       readOnly: false,
       kind: "edit",
     });
@@ -175,25 +197,27 @@ async function handleAuthorizedMessage(message) {
   } else if (command.name === "log") {
     await telegram.sendLongMessage(chatId, await getGitLog(config.projectRoot), message.message_id);
   } else if (command.name === "read") {
-    if (!command.argument) {
+    if (!command.argument && !photo) {
       await telegram.sendMessage(chatId, "Напишите задачу после /read.", message.message_id);
     } else {
       await enqueueTask({
         chatId,
         messageId: message.message_id,
-        task: command.argument,
+        task: command.argument || DEFAULT_PHOTO_TASK,
+        imageFileId: photo?.file_id,
         readOnly: true,
         kind: "read",
       });
     }
   } else if (command.name === "edit") {
-    if (!command.argument) {
+    if (!command.argument && !photo) {
       await telegram.sendMessage(chatId, "Напишите задачу после /edit.", message.message_id);
     } else {
       await enqueueTask({
         chatId,
         messageId: message.message_id,
-        task: command.argument,
+        task: command.argument || DEFAULT_PHOTO_TASK,
+        imageFileId: photo?.file_id,
         readOnly: false,
         kind: "edit",
       });
@@ -210,6 +234,7 @@ async function handleAuthorizedMessage(message) {
         chatId,
         messageId: message.message_id,
         task: createGitTask(command.argument),
+        imageFileId: photo?.file_id,
         readOnly: false,
         kind: "git",
       });
@@ -219,6 +244,7 @@ async function handleAuthorizedMessage(message) {
       chatId,
       messageId: message.message_id,
       task: createPublishTask(command.argument),
+      imageFileId: photo?.file_id,
       readOnly: false,
       kind: "publish",
     });

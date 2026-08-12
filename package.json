@@ -7,7 +7,7 @@
     "typecheck": "tsc --noEmit",
     "telegram:bot": "node --env-file-if-exists=.env telegram-bot/index.mjs",
     "telegram:doctor": "node --env-file-if-exists=.env telegram-bot/doctor.mjs",
-    "telegram:test": "node --test telegram-bot/test/config.test.mjs telegram-bot/test/tasks.test.mjs telegram-bot/test/utils.test.mjs",
+    "telegram:test": "node --test telegram-bot/test/codex.test.mjs telegram-bot/test/config.test.mjs telegram-bot/test/tasks.test.mjs telegram-bot/test/telegram.test.mjs telegram-bot/test/utils.test.mjs",
     "telegram:install-startup": "powershell -NoProfile -ExecutionPolicy Bypass -File telegram-bot/install-startup.ps1",
     "telegram:uninstall-startup": "powershell -NoProfile -ExecutionPolicy Bypass -File telegram-bot/uninstall-startup.ps1"
   },

@@ -106,6 +106,37 @@ function killProcessTree(child) {
   }
 }
 
+export function buildCodexExecArgs({
+  prefixArgs = [],
+  commonArgs = [],
+  sandboxMode,
+  threadId = null,
+  imagePaths = [],
+}) {
+  const imageArgs = imagePaths.flatMap((imagePath) => ["--image", imagePath]);
+  return threadId
+    ? [
+        ...prefixArgs,
+        "exec",
+        "resume",
+        ...commonArgs,
+        ...imageArgs,
+        "-c",
+        `sandbox_mode="${sandboxMode}"`,
+        threadId,
+        "-",
+      ]
+    : [
+        ...prefixArgs,
+        "exec",
+        ...commonArgs,
+        ...imageArgs,
+        "--sandbox",
+        sandboxMode,
+        "-",
+      ];
+}
+
 export class CodexRunner {
   constructor({ projectRoot, model, fullAccess = false, environment = process.env }) {
     this.projectRoot = projectRoot;
@@ -127,7 +158,7 @@ export class CodexRunner {
     return true;
   }
 
-  run({ task, threadId, readOnly = false, onEvent }) {
+  run({ task, threadId, readOnly = false, imagePaths = [], onEvent }) {
     if (this.child) throw new Error("Codex уже выполняет другую задачу.");
 
     const launch = resolveCodexLaunch(this.environment);
@@ -153,25 +184,13 @@ export class CodexRunner {
         ? "danger-full-access"
         : "workspace-write";
 
-    const args = threadId
-      ? [
-          ...launch.prefixArgs,
-          "exec",
-          "resume",
-          ...commonArgs,
-          "-c",
-          `sandbox_mode="${sandboxMode}"`,
-          threadId,
-          "-",
-        ]
-      : [
-          ...launch.prefixArgs,
-          "exec",
-          ...commonArgs,
-          "--sandbox",
-          sandboxMode,
-          "-",
-        ];
+    const args = buildCodexExecArgs({
+      prefixArgs: launch.prefixArgs,
+      commonArgs,
+      sandboxMode,
+      threadId,
+      imagePaths,
+    });
 
     return new Promise((resolve, reject) => {
       const child = spawn(launch.command, args, {
