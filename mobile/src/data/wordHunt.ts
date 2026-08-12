@@ -14,7 +14,7 @@ export const WORD_HUNT_TARGETS:WordHuntTarget[]=[
     id:'family',word:'family',translationRu:'семья',partOfSpeech:'noun',level:'A1',pronunciation:'/ˈfæməli/',categoryId:'family',
     definition:'A group of people who are related to each other.',example:'My family eats dinner together every Sunday.',related:['mother','father','parents','children'],
     neighbors:{parents:8,mother:15,father:18,children:22,home:48,relative:31,people:95,friend:180,office:1200},
-    hints:['This is a noun.','It includes parents, children, and relatives.','Starts with “f”.'],
+    hints:['A group of people who are related to each other.','It includes parents, children, and relatives.','Starts with “f”.'],
     practice:{question:'Which sentence uses “family” correctly?',options:['My family lives nearby.','She family the window.','The soup tastes family.'],correctIndex:0,explanation:'“Family” is a noun for people who are related to one another.'},
   },
   {
@@ -49,7 +49,7 @@ export const WORD_HUNT_TARGETS:WordHuntTarget[]=[
     id:'journey',word:'journey',translationRu:'путешествие',partOfSpeech:'noun',level:'A2',pronunciation:'/ˈdʒɜːni/',categoryId:'travel',
     definition:'An act of travelling from one place to another.',example:'The train journey took three hours.',related:['trip','travel','route','destination'],
     neighbors:{trip:7,travel:13,route:31,destination:38,voyage:22,train:86,stay:810,home:1050},
-    hints:['This is a noun.','It is the experience of travelling from one place to another.','Starts with “j”.'],
+    hints:['An experience of travelling from one place to another.','It can describe a trip from one place to another.','Starts with “j”.'],
     practice:{question:'Which sentence uses “journey” correctly?',options:['The journey across the mountains was long.','We journey the blue bag.','She feels very journey.'],correctIndex:0,explanation:'“Journey” is a noun for travel from one place to another.'},
   },
   {
@@ -70,7 +70,7 @@ export const WORD_HUNT_TARGETS:WordHuntTarget[]=[
     id:'opportunity',word:'opportunity',translationRu:'возможность',partOfSpeech:'noun',level:'B1',pronunciation:'/ˌɒpəˈtjuːnəti/',categoryId:'other',
     definition:'A situation that makes it possible to do something useful or desirable.',example:'This course is a great opportunity to improve your English.',related:['chance','possibility','occasion','opening'],
     neighbors:{chance:7,possibility:18,opening:29,occasion:46,option:61,future:105,problem:870,barrier:1120},
-    hints:['This is a noun.','It means a good chance to do something.','Starts with “o”.'],
+    hints:['A situation that gives you a good chance to do something.','It can open the way to a useful result.','Starts with “o”.'],
     practice:{question:'Which sentence uses “opportunity” correctly?',options:['The job is a valuable opportunity.','She opportunity the letter.','The opportunity soup was hot.'],correctIndex:0,explanation:'“Opportunity” is a noun for a favourable chance to do something.'},
   },
   {
@@ -91,7 +91,7 @@ export const WORD_HUNT_TARGETS:WordHuntTarget[]=[
     id:'insight',word:'insight',translationRu:'глубокое понимание',partOfSpeech:'noun',level:'B2',pronunciation:'/ˈɪnsaɪt/',categoryId:'school',
     definition:'A clear and deep understanding of a person, situation, or problem.',example:'The interview offered valuable insight into her creative process.',related:['understanding','awareness','perspective','discovery'],
     neighbors:{understanding:12,awareness:24,perspective:18,discovery:41,knowledge:53,wisdom:66,idea:104,analysis:128,confusion:990,ignorance:1360},
-    hints:['This is a noun.','It means a deep and useful understanding of something.','Starts with “i”.'],
+    hints:['A deep and useful understanding of something.','It can help you see a problem more clearly.','Starts with “i”.'],
     practice:{question:'Which sentence uses “insight” correctly?',options:['The research gave us new insight into the problem.','She insight the report every morning.','The insight car was extremely fast.'],correctIndex:0,explanation:'“Insight” is a noun for a deep or useful understanding.'},
   },
   {
@@ -114,7 +114,7 @@ function nounTarget(id:string,translationRu:string,level:Exclude<WordHuntLevel,'
   const neighbors=Object.fromEntries(related.map((word,index)=>[word,[9,18,31,47][index]]));
   return {
     id,word:id,translationRu,partOfSpeech:'noun',level,pronunciation:'',categoryId,definition,example,cloze,related,neighbors:{...neighbors,thing:820,action:1260},
-    hints:['This is a noun.',definition,`Starts with “${id[0]}”.`],
+    hints:[definition,cloze?`It fits this context: “${cloze}”.`:`It fits this context: “${example.replace(new RegExp(`\\b${id}\\b`,'i'),'_____')}”.`,`Starts with “${id[0]}”.`],
     practice:{question:`Which sentence uses “${id}” correctly?`,options:[example,`She ${id} the report yesterday.`,`They felt very ${id}.`],correctIndex:0,explanation:`“${id}” is used here as a noun.`},
   };
 }
@@ -138,12 +138,16 @@ const importedTargets=(Object.entries(CEFR_VOCABULARY_BY_LEVEL) as [Exclude<Word
   return nouns.map((entry,index)=>{
     const related=[nouns[(index+1)%nouns.length].word,nouns[(index+2)%nouns.length].word,nouns[(index+3)%nouns.length].word,nouns[(index+4)%nouns.length].word] as [string,string,string,string];
     const source=WORD_HUNT_SOURCE_DETAILS[entry.word];
-    return nounTarget(entry.word,entry.translationRu,level,`An English noun at ${level} level.`,source?.example??`This vocabulary lesson focuses on the noun “${entry.word}”.`,related,'other',source?.cloze);
+    return nounTarget(entry.word,entry.translationRu,level,`Its Russian meaning is “${entry.translationRu}”.`,source?.example??`The missing word means “${entry.translationRu}” in Russian.`,related,'other',source?.cloze);
   });
 });
 
 export const NOUN_HUNT_TARGETS=[...WORD_HUNT_TARGETS.filter(target=>target.partOfSpeech==='noun'),...EXTRA_NOUN_TARGETS,...importedTargets]
-  .filter((target,index,items)=>items.findIndex(item=>item.id===target.id)===index);
+  .filter((target,index,items)=>items.findIndex(item=>item.id===target.id)===index)
+  .map(target=>{
+    const context=target.cloze??target.example.replace(new RegExp(`\\b${target.word}\\b`,'i'),'_____');
+    return {...target,hints:[target.definition,`It fits this context: “${context}”.`,`Starts with “${target.word[0]}”.`] as [string,string,string]};
+  });
 
 export const getDailyHuntTargets=(level:WordHuntLevel='mixed',date=new Date())=>{
   const pool=level==='mixed'?NOUN_HUNT_TARGETS:NOUN_HUNT_TARGETS.filter(target=>target.level===level);

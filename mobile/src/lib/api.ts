@@ -11,25 +11,45 @@ const DEFAULT_API_BASE_URL='https://words-ten-lemon.vercel.app';
 const configuredBaseUrl=process.env.EXPO_PUBLIC_API_BASE_URL;
 const API_BASE_URL=(configuredBaseUrl??(Platform.OS==='web'?'':DEFAULT_API_BASE_URL)).replace(/\/$/,'');
 
+type ApiPayload={error?:string};
+
+async function postJson<T extends ApiPayload>(path:string,body:unknown,{signal,timeoutMs,errorCode}:{signal?:AbortSignal;timeoutMs:number;errorCode:string}){
+  let lastError:unknown;
+  for(let attempt=0;attempt<2;attempt++){
+    const controller=new AbortController();
+    const abort=()=>controller.abort();
+    signal?.addEventListener('abort',abort,{once:true});
+    const timer=setTimeout(abort,timeoutMs);
+    try{
+      const response=await fetch(`${API_BASE_URL}${path}`,{
+        method:'POST',
+        headers:{Accept:'application/json','Content-Type':'application/json'},
+        body:JSON.stringify(body),
+        signal:controller.signal,
+      });
+      const raw=await response.text();
+      let data:T;
+      try{data=JSON.parse(raw) as T}catch{throw new Error(errorCode)}
+      if(!response.ok)throw new Error(data.error||errorCode);
+      return data;
+    }catch(error){
+      if(signal?.aborted)throw error;
+      lastError=error;
+      if(attempt===0)await new Promise(resolve=>setTimeout(resolve,350));
+    }finally{
+      clearTimeout(timer);
+      signal?.removeEventListener('abort',abort);
+    }
+  }
+  if(lastError instanceof Error&&lastError.name!=='AbortError')throw lastError;
+  throw new Error(errorCode);
+}
+
 export async function translateWord(text:string,sourceLanguage:StudyLanguage,signal?:AbortSignal){
-  const response=await fetch(`${API_BASE_URL}/api/translate`,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({text,sourceLanguage}),
-    signal,
-  });
-  const data=await response.json() as {suggestions?:string[];error?:string};
-  if(!response.ok)throw new Error(data.error||'Translate failed');
+  const data=await postJson<{suggestions?:string[];error?:string}>('/api/translate',{text,sourceLanguage},{signal,timeoutMs:20000,errorCode:'Translate failed'});
   return data.suggestions??[];
 }
 
 export async function analyzeYoutubeVideo(url:string,language:StudyLanguage){
-  const response=await fetch(`${API_BASE_URL}/api/youtube-vocabulary`,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({url,language}),
-  });
-  const data=await response.json() as VideoAnalysis&{error?:string};
-  if(!response.ok)throw new Error(data.error||'NETWORK_ERROR');
-  return data;
+  return postJson<VideoAnalysis&{error?:string}>('/api/youtube-vocabulary',{url,language},{timeoutMs:75000,errorCode:'NETWORK_ERROR'});
 }
