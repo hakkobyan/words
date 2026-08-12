@@ -7,7 +7,7 @@ import {VideoAnalysis} from '@/lib/youtube-vocabulary';
 // on every deployment except production and get blocked by CORS. Native has no
 // origin to be relative to, so it needs the deployed URL.
 // Either can be pointed elsewhere with EXPO_PUBLIC_API_BASE_URL in mobile/.env.
-const DEFAULT_API_BASE_URL='https://words-ten-lemon.vercel.app';
+const DEFAULT_API_BASE_URL='https://flip-fox.vercel.app';
 const configuredBaseUrl=process.env.EXPO_PUBLIC_API_BASE_URL;
 const API_BASE_URL=(configuredBaseUrl??(Platform.OS==='web'?'':DEFAULT_API_BASE_URL)).replace(/\/$/,'');
 
