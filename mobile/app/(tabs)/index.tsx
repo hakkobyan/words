@@ -38,7 +38,7 @@ export default function Home() {
   return (
     <ScrollView className="flex-1 bg-paper" {...dataSet({ screenPad: 'true' })} contentContainerStyle={screenPadding} contentContainerClassName="w-full max-w-[720px] self-center p-4 gap-5 pb-28">
       <View className="pr-14">
-        <Text className="text-muted text-sm mb-1">{pick('Ваш словарь', 'Your vocabulary')}</Text>
+        <Text className="text-muted text-sm mb-1">FlipFox</Text>
         <Text className="text-3xl font-black text-ink tracking-tight">
           {pick('Продолжим учиться?', 'Ready to keep learning?')}
         </Text>

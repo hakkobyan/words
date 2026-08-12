@@ -5,7 +5,7 @@ export function createGitTask(instruction) {
 }
 
 export function createPublishTask(description) {
-  return `Опубликуй текущие полезные изменения проекта words полным безопасным GitHub-процессом.
+  return `Опубликуй текущие полезные изменения FlipFox в репозитории words полным безопасным GitHub-процессом.
 
 Контекст изменений от пользователя: ${description || "опубликовать текущие изменения"}
 

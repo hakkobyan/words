@@ -62,7 +62,7 @@ export default function Onboarding() {
               <View className="w-9 h-9 rounded-xl bg-primary-bg items-center justify-center">
                 <BookOpen size={19} color={colors.cardStrong} />
               </View>
-              <Text className="text-ink text-lg font-black">words</Text>
+              <Text className="text-ink text-lg font-black">FlipFox</Text>
             </View>
             <Text className="text-muted text-xs font-bold">{stepNumber} / 3</Text>
           </View>

@@ -10,9 +10,9 @@ import { createGitTask, createPublishTask } from "./tasks.mjs";
 import { MAX_TELEGRAM_IMAGE_BYTES, TelegramClient } from "./telegram.mjs";
 import { parseCommand, shorten } from "./utils.mjs";
 
-const HELP = `Управление проектом words
+const HELP = `Управление FlipFox
 
-Отправьте текст или фото с подписью-задачей — Codex изучит изображение, изменит только проект words, проверит результат и вернёт отчёт.
+Отправьте текст или фото с подписью-задачей — Codex изучит изображение, изменит только FlipFox в репозитории words, проверит результат и вернёт отчёт.
 
 /edit задача — изменить код, дизайн или данные проекта
 /read задача — только изучить проект, без изменений
@@ -38,7 +38,7 @@ let draining = false;
 let closing = false;
 let stateWrite = Promise.resolve();
 
-const DEFAULT_PHOTO_TASK = "Изучи прикреплённую фотографию, определи, что на ней важно для проекта words, и дай полезный ответ.";
+const DEFAULT_PHOTO_TASK = "Изучи прикреплённую фотографию, определи, что на ней важно для FlipFox, и дай полезный ответ.";
 
 async function persistState() {
   const snapshot = { ...state };
@@ -70,7 +70,7 @@ function updateProgress(chatId, messageId, event, progress) {
 
 async function executeTask(job) {
   const startLabels = {
-    edit: "✏️ Изменяю проект words…",
+    edit: "✏️ Изменяю FlipFox…",
     git: "🌿 Выполняю Git/GitHub-задачу…",
     publish: "🚀 Проверяю и публикую изменения…",
     read: "🔎 Изучаю проект…",
@@ -187,7 +187,7 @@ async function handleAuthorizedMessage(message) {
 
   if (["start", "help"].includes(command.name)) {
     const accessStatus = config.fullAccess
-      ? "Режим доступа: FULL — разрешены изменения файлов и .git только для проекта words."
+      ? "Режим доступа: FULL — разрешены изменения FlipFox и .git только в репозитории words."
       : "Режим доступа: workspace-write — изменения .git могут быть заблокированы.";
     await telegram.sendMessage(chatId, `${HELP}\n\n${accessStatus}`, message.message_id);
   } else if (command.name === "status") {
